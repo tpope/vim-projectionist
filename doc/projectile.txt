@@ -1,4 +1,4 @@
-*projectile.txt* *projectile* Project configration
+*projectile.txt* *projectile* Project configuration
 
 Author:  Tim Pope <http://tpo.pe/>
 Repo:    https://github.com/tpope/vim-projectile

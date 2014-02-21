@@ -70,8 +70,8 @@ function! s:expand_placeholders(string, placeholders) abort
   if type(a:string) ==# type([]) || type(a:string) ==# type({})
     return map(copy(a:string), 's:expand_placeholders(v:val, a:placeholders)')
   endif
-  let ph = extend({'%': '%'}, a:placeholders)
-  let value = substitute(a:string, '%\([^: ]\)', '\=get(ph, submatch(1), "\001")', 'g')
+  let ph = extend({'%%': '%'}, a:placeholders)
+  let value = substitute(a:string, '%[^: ]\|{[^{}]*}', '\=get(ph, submatch(0), "\001")', 'g')
   return value =~# "\001" ? '' : value
 endfunction
 
@@ -88,9 +88,10 @@ function! projectile#query(key) abort
       if s:startswith(name, prefix) && s:endswith(name, suffix) && has_key(projections[pattern], a:key)
         let root = tr(name[strlen(prefix) : -strlen(suffix)-1], projectile#slash(), '/')
         let ph = {
-              \ 's': root,
-              \ 'd': tr(root, '/', '.'),
-              \ 'u': tr(root, '/', '_'),
+              \ '{}': root,
+              \ '%s': root,
+              \ '%d': tr(root, '/', '.'),
+              \ '%u': tr(root, '/', '_'),
               \ }
         call add(candidates, [pre, s:expand_placeholders(projections[pattern][a:key], ph)])
       endif

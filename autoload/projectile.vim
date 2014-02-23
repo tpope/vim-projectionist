@@ -300,6 +300,7 @@ function! projectile#apply_template() abort
     %delete_
     call setline(1, split(template, "\n"))
     setlocal nomodified
+    doautocmd BufReadPost
   endif
   return ''
 endfunction

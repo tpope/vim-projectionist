@@ -48,7 +48,7 @@ function! ProjectileDetect(path) abort
 
   try
     let g:projectile_file = file
-    silent doautocmd <nomodeline> User ProjectileDetect
+    silent doautocmd User ProjectileDetect
   finally
     unlet! g:projectile_file
   endtry

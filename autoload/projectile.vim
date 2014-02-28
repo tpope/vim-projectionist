@@ -243,8 +243,29 @@ function! s:open_projection(cmd, variants, ...) abort
   return a:cmd . ' ' . fnameescape(target)
 endfunction
 
+function! s:projection_commands_pattern()
+  let command_patterns = []
+  for prefix in keys(s:commands)
+    for suffix in keys(projectile#commands())
+      let command = prefix . suffix
+      for i in range(len(command) - 1, 0, -1)
+        if exists(':' . strpart(command, 0, i)) != 1
+          let cutoff = i + 1
+          break
+        endif
+      endfor
+      if cutoff == len(command)
+        let command_patterns += [command]
+      else
+        let command_patterns += [strpart(command, 0, cutoff) . '%[' . strpart(command, cutoff) . ']']
+      endif
+    endfor
+  endfor
+  return '\v<(' . join(command_patterns, '|') . ')>'
+endfunction
+
 function! s:projection_complete(lead, cmdline, _) abort
-  execute matchstr(a:cmdline, '[A-Z]\w\+') . ' &'
+  execute matchstr(a:cmdline, s:projection_commands_pattern()) . ' &'
   let results = []
   for format in s:last_formats
     if format !~# '%s'

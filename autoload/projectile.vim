@@ -244,7 +244,7 @@ function! s:open_projection(cmd, variants, ...) abort
 endfunction
 
 function! s:projection_complete(lead, cmdline, _) abort
-  execute matchstr(a:cmdline, '[A-Z]\w\+') . ' &'
+  execute matchstr(a:cmdline, '[' . join(keys(s:commands), '') . ']\w\+') . ' &'
   let results = []
   for format in s:last_formats
     if format !~# '%s'

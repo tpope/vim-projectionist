@@ -65,6 +65,7 @@ augroup projectile
         \ if empty(&filetype) |
         \   call ProjectileDetect(expand('<afile>:p')) |
         \ endif
+  autocmd VimEnter * if expand("<amatch>") == "" | call ProjectileDetect(getcwd()) | endif
   autocmd BufWritePost .projections.json call ProjectileDetect(expand('<afile>:p'))
   autocmd BufNewFile *
         \ if !empty(b:projectiles) |

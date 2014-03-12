@@ -13,11 +13,11 @@ Maven project:
 >
     {
       "src/main/java/*.java": {
-        "alternate": "src/test/java/%s.java",
+        "alternate": "src/test/java/{}.java",
         "command": "source"
       },
       "src/test/java/*.java": {
-        "alternate": "src/main/java/%s.java",
+        "alternate": "src/main/java/{}.java",
         "command": "test"
       },
       "*.java": {"dispatch": "javac %"},
@@ -25,9 +25,23 @@ Maven project:
     }
 <
 
-In property values, "%s" will be replaced by the portion of the glob matched
-by the "*".  Also available are the dotted variant "%d" and the underscored
-variant "%u".
+In property values, "{}" will be replaced by the portion of the glob matched
+by the "*".  You can also chain one or more transformations inside the braces
+separated by bars, e.g. "{dot|hyphenate}".  The complete list of available
+transformations is as follows:
+
+Name           Behavior ~
+dot            / to .
+underscore     / to _
+backslash      / to \
+colons         / to ::
+hyphenate      _ to -
+camelcase      remove each underscore and capitalize following letter
+capitalize     capitalize first letter and each letter after a slash
+head           remove last slash separated component
+tail           remove all but last slash separated component
+open           literal {
+close          literal }
 
 The full list of available properties in a projection is as follows:
 

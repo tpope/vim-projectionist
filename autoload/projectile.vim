@@ -66,12 +66,76 @@ function! s:projectiles() abort
   return projectiles
 endfunction
 
-function! s:expand_placeholders(string, placeholders) abort
-  if type(a:string) ==# type([]) || type(a:string) ==# type({})
-    return map(copy(a:string), 's:expand_placeholders(v:val, a:placeholders)')
+if !exists('g:projectile_transformations')
+  let g:projectile_transformations = {}
+endif
+
+function! g:projectile_transformations.dot(input, o) abort
+  return substitute(a:input, '/', '.', 'g')
+endfunction
+
+function! g:projectile_transformations.underscore(input, o) abort
+  return substitute(a:input, '/', '_', 'g')
+endfunction
+
+function! g:projectile_transformations.backslash(input, o) abort
+  return substitute(a:input, '/', '\\', 'g')
+endfunction
+
+function! g:projectile_transformations.colons(input, o) abort
+  return substitute(a:input, '/', '::', 'g')
+endfunction
+
+function! g:projectile_transformations.hyphenate(input, o) abort
+  return tr(a:input, '_', '-')
+endfunction
+
+function! g:projectile_transformations.camelcase(input, o) abort
+  return substitute(a:input, '_\(.\)', '\u\1', 'g')
+endfunction
+
+function! g:projectile_transformations.capitalize(input, o) abort
+  return substitute(a:input, '\%(^\|/\)\zs\(.\)', '\u\1', 'g')
+endfunction
+
+function! g:projectile_transformations.head(input, o) abort
+  return substitute(a:input, '/[^/]*$', '', '')
+endfunction
+
+function! g:projectile_transformations.tail(input, o) abort
+  return substitute(a:input, '.*/', '', '')
+endfunction
+
+function! g:projectile_transformations.open(input, o) abort
+  return '{'
+endfunction
+
+function! g:projectile_transformations.close(input, o) abort
+  return '}'
+endfunction
+
+function! s:expand_placeholder(placeholder, match) abort
+  let value = a:match
+  for transform in split(a:placeholder[1:-2], '|')
+    if !has_key(g:projectile_transformations, transform)
+      return "\001"
+    endif
+    let value = g:projectile_transformations[transform](value, {})
+  endfor
+  return value
+endfunction
+
+function! s:expand_placeholders(value, match) abort
+  if type(a:value) ==# type([]) || type(a:value) ==# type({})
+    return map(copy(a:value), 's:expand_placeholders(v:val, a:match)')
   endif
-  let ph = extend({'%%': '%'}, a:placeholders)
-  let value = substitute(a:string, '%[^: ]\|{[^{}]*}', '\=get(ph, submatch(0), "\001")', 'g')
+  let legacy = {
+        \ '%s': '{}',
+        \ '%d': '{dot}',
+        \ '%u': '{underscore}',
+        \ '%%': '%'}
+  let value = substitute(a:value, '%[^: ]', '\=get(legacy, submatch(0), "\001")', 'g')
+  let value = substitute(value, '{[^{}]*}', '\=s:expand_placeholder(submatch(0), a:match)', 'g')
   return value =~# "\001" ? '' : value
 endfunction
 
@@ -87,13 +151,7 @@ function! projectile#query(key) abort
       let [prefix, suffix; _] = split(pattern, '\*', 1)
       if s:startswith(name, prefix) && s:endswith(name, suffix) && has_key(projections[pattern], a:key)
         let root = tr(name[strlen(prefix) : -strlen(suffix)-1], projectile#slash(), '/')
-        let ph = {
-              \ '{}': root,
-              \ '%s': root,
-              \ '%d': tr(root, '/', '.'),
-              \ '%u': tr(root, '/', '_'),
-              \ }
-        call add(candidates, [pre, s:expand_placeholders(projections[pattern][a:key], ph)])
+        call add(candidates, [pre, s:expand_placeholders(projections[pattern][a:key], root)])
       endif
     endfor
   endfor

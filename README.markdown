@@ -90,8 +90,8 @@ an example configuration for Maven that allows you to jump between the
 implementation and test:
 
     {
-      "src/main/java/*.java": {"alternate": "src/test/java/%s.java"},
-      "src/test/java/*.java": {"alternate": "src/main/java/%s.java"}
+      "src/main/java/*.java": {"alternate": "src/test/java/{}.java"},
+      "src/test/java/*.java": {"alternate": "src/main/java/{}.java"}
     }
 
 Bonus feature: `:A {filename}` edits a file relative to the root of the

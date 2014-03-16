@@ -185,22 +185,27 @@ function! projectile#append(root, value) abort
   call add(b:projectiles[a:root], a:value)
 endfunction
 
+function! projectile#define_navigation_command(command, patterns)
+  for [prefix, excmd] in items(s:prefixes)
+    execute 'command! -buffer -bar -bang -nargs=* -complete=customlist,s:projection_complete'
+          \ prefix . substitute(a:command, '\A', '', 'g')
+          \ ':execute s:open_projection("'.excmd.'<bang>",'.string(a:patterns).',<f-args>)'
+  endfor
+endfunction
+
 function! projectile#activate() abort
   if empty(b:projectiles)
     finish
   endif
   command! -buffer -bar -bang -nargs=? -complete=customlist,s:dir_complete Cd   :cd<bang>  `=projectile#path(<q-args>)`
   command! -buffer -bar -bang -nargs=? -complete=customlist,s:dir_complete Lcd  :lcd<bang> `=projectile#path(<q-args>)`
-  let commands = items(projectile#commands())
-  for [prefix, excmd] in items(s:commands)
+  for [command, patterns] in items(projectile#navigation_commands())
+    call projectile#define_navigation_command(command, patterns)
+  endfor
+  for [prefix, excmd] in items(s:prefixes)
     execute 'command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete'
           \ 'A'.prefix
           \ ':execute s:edit_command("'.excmd.'<bang>",<f-args>)'
-    for [command, patterns] in commands
-      execute 'command! -buffer -bar -bang -nargs=* -complete=customlist,s:projection_complete'
-            \ prefix . substitute(command, '\s', '', 'g')
-            \ ':execute s:open_projection("'.excmd.'<bang>",'.string(patterns).',<f-args>)'
-    endfor
   endfor
   command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete A AE<bang> <args>
   for compiler in projectile#query_scalar('compiler')
@@ -246,14 +251,14 @@ endfunction
 
 " Section: Navigation commands
 
-let s:commands = {
+let s:prefixes = {
       \ 'E': 'edit',
       \ 'S': 'split',
       \ 'V': 'vsplit',
       \ 'T': 'tabedit',
       \ 'D': 'read'}
 
-function! projectile#commands() abort
+function! projectile#navigation_commands() abort
   let commands = {}
   for [path, projections] in s:projectiles()
     for [pattern, projection] in items(projections)
@@ -262,8 +267,8 @@ function! projectile#commands() abort
         if !has_key(commands, name)
           let commands[name] = []
         endif
-        let command = {'root': path, 'pattern': pattern}
-        call extend(commands[name], [command])
+        let command = [path, pattern]
+        call add(commands[name], command)
       endif
     endfor
   endfor
@@ -274,7 +279,7 @@ endfunction
 function! s:open_projection(cmd, variants, ...) abort
   let formats = []
   for variant in a:variants
-    call add(formats, variant.root . projectile#slash() . substitute(variant.pattern, '\*', '%s', ''))
+    call add(formats, variant[0] . projectile#slash() . substitute(variant[1], '\*', '%s', ''))
   endfor
   if a:0 && a:1 ==# '&'
     let s:last_formats = formats
@@ -302,7 +307,7 @@ function! s:open_projection(cmd, variants, ...) abort
 endfunction
 
 function! s:projection_complete(lead, cmdline, _) abort
-  execute matchstr(a:cmdline, '[' . join(keys(s:commands), '') . ']\w\+') . ' &'
+  execute matchstr(a:cmdline, '[' . join(keys(s:prefixes), '') . ']\w\+') . ' &'
   let results = []
   for format in s:last_formats
     if format !~# '%s'

@@ -330,10 +330,10 @@ function! s:edit_command(cmd, ...) abort
     let file = a:1
   else
     let alternates = projectile#query_file('alternate')
-    if empty(alternates)
+    let file = get(filter(copy(alternates), '!empty(getftype(v:val))'), 0, '')
+    if empty(file)
       return 'echoerr "No alternate file"'
     endif
-    let file = get(filter(copy(alternates), '!empty(getftype(v:val))'), 0, alternates[0])
   endif
   if !isdirectory(fnamemodify(file, ':h'))
     call mkdir(fnamemodify(file, ':h'), 'p')

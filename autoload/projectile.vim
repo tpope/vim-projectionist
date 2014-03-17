@@ -147,7 +147,7 @@ function! projectile#query(key) abort
     if has_key(projections, name) && has_key(projections[name], a:key)
       call add(candidates, [pre, projections[name][a:key]])
     endif
-    for pattern in reverse(sort(filter(keys(projections), 'v:val =~# "^[^*]*\\*[^*]*$"'), function('projectile#lencmp')))
+    for pattern in reverse(sort(filter(keys(projections), 'v:val =~# "^[^*{}]*\\*[^*{}]*$"'), function('projectile#lencmp')))
       let [prefix, suffix; _] = split(pattern, '\*', 1)
       if s:startswith(name, prefix) && s:endswith(name, suffix) && has_key(projections[pattern], a:key)
         let root = tr(name[strlen(prefix) : -strlen(suffix)-1], projectile#slash(), '/')

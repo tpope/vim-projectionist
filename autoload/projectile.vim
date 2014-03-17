@@ -262,7 +262,7 @@ function! projectile#navigation_commands() abort
   let commands = {}
   for [path, projections] in s:projectiles()
     for [pattern, projection] in items(projections)
-      if has_key(projection, 'command')
+      if has_key(projection, 'command') && pattern =~# '^[^*{}]*\*\=[^*{}]*$'
         let name = projection.command
         if !has_key(commands, name)
           let commands[name] = []

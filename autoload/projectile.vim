@@ -178,11 +178,11 @@ endfunction
 
 " Section: Activation
 
-function! projectile#append(root, value) abort
+function! projectile#append(root, ...) abort
   if !has_key(b:projectiles, a:root)
     let b:projectiles[a:root] = []
   endif
-  call add(b:projectiles[a:root], a:value)
+  call add(b:projectiles[a:root], get(a:000, -1, {}))
 endfunction
 
 function! projectile#define_navigation_command(command, patterns)

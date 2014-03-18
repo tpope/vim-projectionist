@@ -103,11 +103,11 @@ function! g:projectile_transformations.capitalize(input, o) abort
 endfunction
 
 function! g:projectile_transformations.head(input, o) abort
-  return substitute(a:input, '/[^/]*$', '', '')
+  return substitute(a:input, '[\\/][^\\/]*$', '', '')
 endfunction
 
 function! g:projectile_transformations.tail(input, o) abort
-  return substitute(a:input, '.*/', '', '')
+  return substitute(a:input, '.*[\\/]', '', '')
 endfunction
 
 function! g:projectile_transformations.open(input, o) abort
@@ -118,20 +118,27 @@ function! g:projectile_transformations.close(input, o) abort
   return '}'
 endfunction
 
-function! s:expand_placeholder(placeholder, match) abort
-  let value = a:match
-  for transform in split(a:placeholder[1:-2], '|')
+function! s:expand_placeholder(placeholder, expansions) abort
+  let transforms = split(a:placeholder[1:-2], '|')
+  if has_key(a:expansions, get(transforms, 0, '}'))
+    let value = a:expansions[remove(transforms, 0)]
+  elseif has_key(a:expansions, 'match')
+    let value = a:expansions.match
+  else
+    return "\001"
+  endif
+  for transform in transforms
     if !has_key(g:projectile_transformations, transform)
       return "\001"
     endif
-    let value = g:projectile_transformations[transform](value, {})
+    let value = g:projectile_transformations[transform](value, a:expansions)
   endfor
   return value
 endfunction
 
-function! s:expand_placeholders(value, match) abort
+function! s:expand_placeholders(value, expansions) abort
   if type(a:value) ==# type([]) || type(a:value) ==# type({})
-    return map(copy(a:value), 's:expand_placeholders(v:val, a:match)')
+    return map(copy(a:value), 's:expand_placeholders(v:val, a:expansions)')
   endif
   let legacy = {
         \ '%s': '{}',
@@ -139,14 +146,15 @@ function! s:expand_placeholders(value, match) abort
         \ '%u': '{underscore}',
         \ '%%': '%'}
   let value = substitute(a:value, '%[^: ]', '\=get(legacy, submatch(0), "\001")', 'g')
-  let value = substitute(value, '{[^{}]*}', '\=s:expand_placeholder(submatch(0), a:match)', 'g')
+  let value = substitute(value, '{[^{}]*}', '\=s:expand_placeholder(submatch(0), a:expansions)', 'g')
   return value =~# "\001" ? '' : value
 endfunction
 
-function! projectile#query(key) abort
+function! projectile#query(key, ...) abort
   let candidates = []
   for [path, projections] in s:projectiles()
     let pre = path . projectile#slash()
+    let expansions = extend({'project': path, 'file': expand('%:p')}, a:0 ? a:1 : {})
     let name = expand('%:p')[strlen(path)+1:-1]
     if has_key(projections, name) && has_key(projections[name], a:key)
       call add(candidates, [pre, projections[name][a:key]])
@@ -154,8 +162,8 @@ function! projectile#query(key) abort
     for pattern in reverse(sort(filter(keys(projections), 'v:val =~# "^[^*{}]*\\*[^*{}]*$"'), function('projectile#lencmp')))
       let [prefix, suffix; _] = split(pattern, '\*', 1)
       if s:startswith(name, prefix) && s:endswith(name, suffix) && has_key(projections[pattern], a:key)
-        let root = tr(name[strlen(prefix) : -strlen(suffix)-1], projectile#slash(), '/')
-        call add(candidates, [pre, s:expand_placeholders(projections[pattern][a:key], root)])
+        let expansions.match = tr(name[strlen(prefix) : -strlen(suffix)-1], projectile#slash(), '/')
+        call add(candidates, [pre, s:expand_placeholders(projections[pattern][a:key], expansions)])
       endif
     endfor
   endfor

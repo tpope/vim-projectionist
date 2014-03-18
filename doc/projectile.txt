@@ -20,7 +20,7 @@ Maven project:
         "alternate": "src/main/java/{}.java",
         "command": "test"
       },
-      "*.java": {"dispatch": "javac %"},
+      "*.java": {"dispatch": "javac {file}"},
       "*": {"compiler": "maven"}
     }
 <
@@ -41,6 +41,8 @@ camelcase      remove each underscore and capitalize following letter
 capitalize     capitalize first letter and each letter after a slash
 head           remove last slash separated component
 tail           remove all but last slash separated component
+file           absolute path to file
+project        absolute path to project
 open           literal {
 close          literal }
 

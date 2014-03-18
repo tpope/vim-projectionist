@@ -36,6 +36,7 @@ underscore     / to _
 backslash      / to \
 colons         / to ::
 hyphenate      _ to -
+uppercase      uppercase
 camelcase      remove each underscore and capitalize following letter
 capitalize     capitalize first letter and each letter after a slash
 head           remove last slash separated component

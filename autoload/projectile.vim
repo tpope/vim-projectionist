@@ -141,12 +141,11 @@ function! s:expand_placeholders(value, expansions) abort
     return map(copy(a:value), 's:expand_placeholders(v:val, a:expansions)')
   endif
   let legacy = {
-        \ '%s': '{}',
-        \ '%d': '{dot}',
-        \ '%u': '{underscore}',
-        \ '%%': '%'}
-  let value = substitute(a:value, '%[^: ]', '\=get(legacy, submatch(0), "\001")', 'g')
-  let value = substitute(value, '{[^{}]*}', '\=s:expand_placeholder(submatch(0), a:expansions)', 'g')
+        \ '%s': 'replace %s with {}',
+        \ '%d': 'replace %d with {dot}',
+        \ '%u': 'replace %u with {underscore}'}
+  let value = substitute(a:value, '{[^{}]*}', '\=s:expand_placeholder(submatch(0), a:expansions)', 'g')
+  let value = substitute(value, '%[sdu]', '\=get(legacy, submatch(0), "\001")', 'g')
   return value =~# "\001" ? '' : value
 endfunction
 
@@ -342,6 +341,10 @@ function! s:edit_command(cmd, ...) abort
     let file = a:1
   else
     let alternates = projectile#query_file('alternate')
+    let warning = get(filter(copy(alternates), 'v:val =~# "replace %.*}"'), 0, '')
+    if !empty(warning)
+      return 'echoerr '.string(matchstr(warning, 'replace %.*}').' in alternate projection')
+    endif
     let file = get(filter(copy(alternates), '!empty(getftype(v:val))'), 0, '')
     if empty(file)
       return 'echoerr "No alternate file"'

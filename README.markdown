@@ -104,9 +104,9 @@ project.
 Check out these examples for a Ruby project:
 
     {
-      "*": {"compiler": "rake"},
+      "*": {"make": "rake -f {project}/Rakefile"},
       "*.rb": {"indent": 2},
-      "spec/*_spec.rb": {"dispatch": "rspec %"}
+      "spec/*_spec.rb": {"dispatch": "rspec {file}"}
     }
 
 That last one sets the default for [dispatch.vim][].  The possibilities are

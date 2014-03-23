@@ -21,7 +21,7 @@ Maven project:
         "command": "test"
       },
       "*.java": {"dispatch": "javac {file}"},
-      "*": {"compiler": "maven"}
+      "*": {"make": "mvn -f {project}/pom.xml"}
     }
 <
 
@@ -59,10 +59,6 @@ The full list of available properties in a projection is as follows:
         If this option is provided for a literal filename rather than a glob,
         it is used as the default destination of the navigation command when
         no argument is given.
-						*projectile-compiler*
-"compiler" ~
-        Selects a default |:compiler|.  This is useful to set from a "*"
-        projection.
 						*projectile-dispatch*
 "dispatch" ~
         Default task to use for |:Dispatch| in dispatch.vim.  (Once the
@@ -71,6 +67,11 @@ The full list of available properties in a projection is as follows:
 						*projectile-indent*
 "indent" ~
         Default value for 'shiftwidth'.
+						*projectile-make*
+"make" ~
+        Sets 'makeprg'.  Also loads a |:compiler| plugin if one is available
+        matching the executable name.  This is useful to set from a "*"
+        projection.
 						*projectile-template*
 "template" ~
         Array of lines to use when creating a new file.

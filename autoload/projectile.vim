@@ -219,11 +219,15 @@ function! projectile#activate() abort
           \ ':execute s:edit_command("'.excmd.'<bang>",<f-args>)'
   endfor
   command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete A AE<bang> <args>
-  for compiler in projectile#query_scalar('compiler')
-    if !empty(findfile('compiler/'.compiler.'.vim', &rtp))
-      execute 'compiler '.compiler
-      break
+  for makeprg in projectile#query_scalar('make')
+    unlet! b:current_compiler
+    setlocal errorformat<
+    let executable = fnamemodify(matchstr(makeprg, '\S\+'), ':t:r')
+    if !empty(findfile('compiler/'.executable.'.vim', escape(&rtp, ' ')))
+      execute 'compiler '.executable
     endif
+    let &l:makeprg = makeprg
+    break
   endfor
   for b:dispatch in projectile#query_scalar('dispatch')
     break

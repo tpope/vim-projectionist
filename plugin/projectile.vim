@@ -48,7 +48,11 @@ function! ProjectileDetect(path) abort
 
   try
     let g:projectile_file = file
-    silent doautocmd User ProjectileDetect
+    if v:version + has('patch438') >= 704
+      silent doautocmd <nomodeline> User ProjectileDetect
+    else
+      silent doautocmd User ProjectileDetect
+    endif
   finally
     unlet! g:projectile_file
   endtry

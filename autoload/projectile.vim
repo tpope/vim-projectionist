@@ -103,7 +103,7 @@ function! g:projectile_transformations.capitalize(input, o) abort
 endfunction
 
 function! g:projectile_transformations.head(input, o) abort
-  return substitute(a:input, '.[^'.projectil#slash().'/]*$', '', '')
+  return substitute(a:input, '.[^'.projectile#slash().'/]*$', '', '')
 endfunction
 
 function! g:projectile_transformations.tail(input, o) abort

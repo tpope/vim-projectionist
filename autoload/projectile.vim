@@ -102,13 +102,17 @@ function! g:projectile_transformations.capitalize(input, o) abort
   return substitute(a:input, '\%(^\|/\)\zs\(.\)', '\u\1', 'g')
 endfunction
 
-function! g:projectile_transformations.head(input, o) abort
+function! g:projectile_transformations.dirname(input, o) abort
   return substitute(a:input, '.[^'.projectile#slash().'/]*$', '', '')
 endfunction
 
-function! g:projectile_transformations.tail(input, o) abort
+let g:projectile_transformations.head = g:projectile_transformations.dirname
+
+function! g:projectile_transformations.basename(input, o) abort
   return substitute(a:input, '.*['.projectile#slash().'/]', '', '')
 endfunction
+
+let g:projectile_transformations.tail = g:projectile_transformations.basename
 
 function! g:projectile_transformations.open(input, o) abort
   return '{'

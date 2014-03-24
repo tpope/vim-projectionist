@@ -24,7 +24,6 @@ Maven project:
       "*": {"make": "mvn -f {project}/pom.xml"}
     }
 <
-
 In property values, "{}" will be replaced by the portion of the glob matched
 by the "*".  You can also chain one or more transformations inside the braces
 separated by bars, e.g. "{dot|hyphenate}".  The complete list of available

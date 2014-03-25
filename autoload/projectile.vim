@@ -189,7 +189,11 @@ endfunction
 function! projectile#query_scalar(key) abort
   let values = []
   for [root, match] in projectile#query(a:key)
-    call extend(values, type(match) == type([]) ? match : [match])
+    if type(match) == type([])
+      call extend(values, match)
+    elseif type(match) !=# type({})
+      call add(values, match)
+    endif
     unlet match
   endfor
   return values

@@ -229,6 +229,14 @@ function! projectile#query_with_alternate(key) abort
   return values
 endfunction
 
+function! s:shellcmd(arg) abort
+  if type(a:arg) == type([])
+    return join(map(copy(a:arg), 'v:val =~# "^[[:alnum:]_/.:=-]\\+$" ? v:val : shellescape(v:val)'), ' ')
+  elseif type(a:arg) == type('')
+    return a:arg
+  endif
+endfunction
+
 function! projectile#activate() abort
   if empty(b:projectiles)
     finish
@@ -244,7 +252,12 @@ function! projectile#activate() abort
           \ ':execute s:edit_command("'.excmd.'<bang>",<f-args>)'
   endfor
   command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete A AE<bang> <args>
-  for makeprg in projectile#query_scalar('make')
+  for [root, make] in projectile#query('make')
+    let makeprg = s:shellcmd(make)
+    if empty(makeprg)
+      unlet make
+      continue
+    endif
     unlet! b:current_compiler
     setlocal errorformat<
     let executable = fnamemodify(matchstr(makeprg, '\S\+'), ':t:r')
@@ -255,14 +268,11 @@ function! projectile#activate() abort
     break
   endfor
   for [root, dispatch] in projectile#query_with_alternate('dispatch')
-    if type(dispatch) == type([])
-      let b:dispatch = join(map(copy(dispatch), 'v:val =~# "^[[:alnum:]_/.:=-]\\+$" ? v:val : shellescape(v:val)'), ' ')
-      break
-    elseif type(dispatch) == type('')
-      let b:dispatch = dispatch
+    let b:dispatch = s:shellcmd(dispatch)
+    if !empty(b:dispatch)
       break
     endif
-    unlet dispatch
+    unlet dispatch b:dispatch
   endfor
   for &l:shiftwidth in projectile#query_scalar('indent')
     break

@@ -60,9 +60,8 @@ The full list of available properties in a projection is as follows:
         no argument is given.
 						*projectile-dispatch*
 "dispatch" ~
-        Default task to use for |:Dispatch| in dispatch.vim.  (Once the
-        autocommand API has stabilized, this will probably be moved into
-        dispatch.vim itself.)
+        Default task to use for |:Dispatch| in dispatch.vim.  If the dispatch
+        for any existing alternate file is used instead.
 						*projectile-indent*
 "indent" ~
         Default value for 'shiftwidth'.

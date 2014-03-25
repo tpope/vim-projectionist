@@ -155,10 +155,14 @@ endfunction
 
 function! projectile#query(key, ...) abort
   let candidates = []
+  let file = a:0 > 1 ? a:2 : expand('%:p')
   for [path, projections] in s:projectiles()
     let pre = path . projectile#slash()
-    let expansions = extend({'project': path, 'file': expand('%:p')}, a:0 ? a:1 : {})
-    let name = expand('%:p')[strlen(path)+1:-1]
+    let expansions = extend({'project': path, 'file': file}, a:0 ? a:1 : {})
+    if strpart(file, 0, len(path)) !=# path
+      continue
+    endif
+    let name = file[strlen(path)+1:-1]
     if has_key(projections, name) && has_key(projections[name], a:key)
       call add(candidates, [pre, projections[name][a:key]])
     endif
@@ -183,12 +187,12 @@ function! projectile#query_file(key) abort
 endfunction
 
 function! projectile#query_scalar(key) abort
-  let files = []
-  let _ = {}
-  for [root, _.match] in projectile#query(a:key)
-    call extend(files, type(_.match) == type([]) ? _.match : [_.match])
+  let values = []
+  for [root, match] in projectile#query(a:key)
+    call extend(values, type(match) == type([]) ? match : [match])
+    unlet match
   endfor
-  return files
+  return values
 endfunction
 
 " Section: Activation
@@ -206,6 +210,19 @@ function! projectile#define_navigation_command(command, patterns)
           \ prefix . substitute(a:command, '\A', '', 'g')
           \ ':execute s:open_projection("'.excmd.'<bang>",'.string(a:patterns).',<f-args>)'
   endfor
+endfunction
+
+function! projectile#query_with_alternate(key) abort
+  let values = projectile#query(a:key)
+  for file in projectile#query_file('alternate')
+    for [root, match] in projectile#query('dispatch', {}, file)
+      if filereadable(file)
+        call add(values, [root, match])
+      endif
+      unlet match
+    endfor
+  endfor
+  return values
 endfunction
 
 function! projectile#activate() abort
@@ -233,8 +250,15 @@ function! projectile#activate() abort
     let &l:makeprg = makeprg
     break
   endfor
-  for b:dispatch in projectile#query_scalar('dispatch')
-    break
+  for [root, dispatch] in projectile#query_with_alternate('dispatch')
+    if type(dispatch) == type([])
+      let b:dispatch = join(map(copy(dispatch), 'v:val =~# "^[[:alnum:]_/.:=-]\\+$" ? v:val : shellescape(v:val)'), ' ')
+      break
+    elseif type(dispatch) == type('')
+      let b:dispatch = dispatch
+      break
+    endif
+    unlet dispatch
   endfor
   for &l:shiftwidth in projectile#query_scalar('indent')
     break

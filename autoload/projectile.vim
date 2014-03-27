@@ -164,7 +164,7 @@ function! projectile#query(key, ...) abort
     endif
     let name = file[strlen(path)+1:-1]
     if has_key(projections, name) && has_key(projections[name], a:key)
-      call add(candidates, [pre, projections[name][a:key]])
+      call add(candidates, [pre, s:expand_placeholders(projections[name][a:key], expansions)])
     endif
     for pattern in reverse(sort(filter(keys(projections), 'v:val =~# "^[^*{}]*\\*[^*{}]*$"'), function('projectile#lencmp')))
       let [prefix, suffix; _] = split(pattern, '\*', 1)

@@ -36,7 +36,7 @@ backslash      / to \
 colons         / to ::
 hyphenate      _ to -
 uppercase      uppercase
-camelcase      remove each underscore and capitalize following letter
+camelcase      remove each underscore/hyphen and capitalize following letter
 capitalize     capitalize first letter and each letter after a slash
 dirname        remove last slash separated component
 basename       remove all but last slash separated component

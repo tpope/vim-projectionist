@@ -95,7 +95,7 @@ function! g:projectile_transformations.uppercase(input, o) abort
 endfunction
 
 function! g:projectile_transformations.camelcase(input, o) abort
-  return substitute(a:input, '_\(.\)', '\u\1', 'g')
+  return substitute(a:input, '[_-]\(.\)', '\u\1', 'g')
 endfunction
 
 function! g:projectile_transformations.capitalize(input, o) abort

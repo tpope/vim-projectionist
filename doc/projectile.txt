@@ -35,6 +35,7 @@ underscore     / to _
 backslash      / to \
 colons         / to ::
 hyphenate      _ to -
+blank          _ and - to space
 uppercase      uppercase
 camelcase      remove each underscore/hyphen and capitalize following letter
 capitalize     capitalize first letter and each letter after a slash

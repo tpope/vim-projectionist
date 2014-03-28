@@ -90,6 +90,10 @@ function! g:projectile_transformations.hyphenate(input, o) abort
   return tr(a:input, '_', '-')
 endfunction
 
+function! g:projectile_transformations.blank(input, o) abort
+  return tr(a:input, '_-', '  ')
+endfunction
+
 function! g:projectile_transformations.uppercase(input, o) abort
   return toupper(a:input)
 endfunction

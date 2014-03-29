@@ -64,7 +64,7 @@ endfunction
 
 augroup projectile
   autocmd!
-  autocmd FileType * call ProjectileDetect(expand('<afile>:p'))
+  autocmd FileType,BufFilePost * call ProjectileDetect(expand('<afile>:p'))
   autocmd BufNewFile,BufReadPost *
         \ if empty(&filetype) |
         \   call ProjectileDetect(expand('<afile>:p')) |

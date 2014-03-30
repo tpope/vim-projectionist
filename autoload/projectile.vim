@@ -190,8 +190,8 @@ function! projectile#query_file(key) abort
   return files
 endfunction
 
-function! projectile#query_command(key) abort
-  return filter(map(projectile#query(a:key), 's:shellcmd(v:val[1])'), '!empty(v:val)')
+function! projectile#query_exec(key) abort
+  return filter(map(projectile#query(a:key), '[v:val[0], s:shellcmd(v:val[1])]'), '!empty(v:val[1])')
 endfunction
 
 function! projectile#query_scalar(key) abort
@@ -260,7 +260,7 @@ function! projectile#activate() abort
           \ ':execute s:edit_command("'.excmd.'<bang>",<f-args>)'
   endfor
   command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete A AE<bang> <args>
-  for makeprg in projectile#query_command('make')
+  for [root, makeprg] in projectile#query_exec('make')
     unlet! b:current_compiler
     setlocal errorformat<
     let executable = fnamemodify(matchstr(makeprg, '\S\+'), ':t:r')
@@ -270,7 +270,7 @@ function! projectile#activate() abort
     let &l:makeprg = makeprg
     break
   endfor
-  for b:start in projectile#query_command('start')
+  for [root, b:start] in projectile#query_exec('start')
     break
   endfor
   for [root, dispatch] in projectile#query_with_alternate('dispatch')

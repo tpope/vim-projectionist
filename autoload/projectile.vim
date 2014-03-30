@@ -190,6 +190,10 @@ function! projectile#query_file(key) abort
   return files
 endfunction
 
+function! projectile#query_command(key) abort
+  return filter(map(projectile#query(a:key), 's:shellcmd(v:val[1])'), '!empty(v:val)')
+endfunction
+
 function! projectile#query_scalar(key) abort
   let values = []
   for [root, match] in projectile#query(a:key)
@@ -199,6 +203,19 @@ function! projectile#query_scalar(key) abort
       call add(values, match)
     endif
     unlet match
+  endfor
+  return values
+endfunction
+
+function! projectile#query_with_alternate(key) abort
+  let values = projectile#query(a:key)
+  for file in projectile#query_file('alternate')
+    for [root, match] in projectile#query('dispatch', {}, file)
+      if filereadable(file)
+        call add(values, [root, match])
+      endif
+      unlet match
+    endfor
   endfor
   return values
 endfunction
@@ -218,19 +235,6 @@ function! projectile#define_navigation_command(command, patterns)
           \ prefix . substitute(a:command, '\A', '', 'g')
           \ ':execute s:open_projection("'.excmd.'<bang>",'.string(a:patterns).',<f-args>)'
   endfor
-endfunction
-
-function! projectile#query_with_alternate(key) abort
-  let values = projectile#query(a:key)
-  for file in projectile#query_file('alternate')
-    for [root, match] in projectile#query('dispatch', {}, file)
-      if filereadable(file)
-        call add(values, [root, match])
-      endif
-      unlet match
-    endfor
-  endfor
-  return values
 endfunction
 
 function! s:shellcmd(arg) abort
@@ -256,12 +260,7 @@ function! projectile#activate() abort
           \ ':execute s:edit_command("'.excmd.'<bang>",<f-args>)'
   endfor
   command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete A AE<bang> <args>
-  for [root, make] in projectile#query('make')
-    let makeprg = s:shellcmd(make)
-    if empty(makeprg)
-      unlet make
-      continue
-    endif
+  for makeprg in projectile#query_command('make')
     unlet! b:current_compiler
     setlocal errorformat<
     let executable = fnamemodify(matchstr(makeprg, '\S\+'), ':t:r')
@@ -269,6 +268,9 @@ function! projectile#activate() abort
       execute 'compiler '.executable
     endif
     let &l:makeprg = makeprg
+    break
+  endfor
+  for b:start in projectile#query_command('start')
     break
   endfor
   for [root, dispatch] in projectile#query_with_alternate('dispatch')

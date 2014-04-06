@@ -64,11 +64,16 @@ endfunction
 
 augroup projectile
   autocmd!
-  autocmd FileType,BufFilePost * call ProjectileDetect(expand('<afile>:p'))
+  autocmd FileType *
+        \ if &buftype !~# 'nofile\|quickfix' |
+        \   call ProjectileDetect(expand('<afile>:p')) |
+        \  endif
+  autocmd BufFilePost * call ProjectileDetect(expand('<afile>:p'))
   autocmd BufNewFile,BufReadPost *
         \ if empty(&filetype) |
         \   call ProjectileDetect(expand('<afile>:p')) |
         \ endif
+  autocmd CmdWinEnter * call ProjectileDetect(expand('#:p'))
   autocmd User NERDTreeInit,NERDTreeNewRoot
         \ call ProjectileDetect(b:NERDTreeRoot.path.str())
   autocmd VimEnter *

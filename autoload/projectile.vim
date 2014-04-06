@@ -47,8 +47,12 @@ endfunction
 
 " Section: Querying
 
+function! s:paths() abort
+  return reverse(sort(keys(b:projectiles), function('projectile#lencmp')))
+endfunction
+
 function! projectile#path(...) abort
-  let path = get(sort(keys(b:projectiles), function('projectile#lencmp')), -1, '')
+  let path = get(s:paths(), a:0 > 1 ? a:2 - 1 : 0, '')
   if !empty(path) && a:0
     return path . projectile#slash() . a:1
   else
@@ -58,7 +62,7 @@ endfunction
 
 function! s:projectiles() abort
   let projectiles = []
-  for key in reverse(sort(keys(b:projectiles), function('projectile#lencmp')))
+  for key in s:paths()
     for value in b:projectiles[key]
       call add(projectiles, [key, value])
     endfor
@@ -249,15 +253,17 @@ function! projectile#activate() abort
   if empty(b:projectiles)
     finish
   endif
-  command! -buffer -bar -bang -nargs=? -complete=customlist,s:dir_complete Cd   :cd<bang>  `=projectile#path(<q-args>)`
-  command! -buffer -bar -bang -nargs=? -complete=customlist,s:dir_complete Lcd  :lcd<bang> `=projectile#path(<q-args>)`
+  command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Cd
+        \ exe 'cd<bang>'  fnameescape(projectile#path(<q-args>, <line2>))
+  command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Lcd
+        \ exe 'lcd<bang>' fnameescape(projectile#path(<q-args>, <line2>))
   for [command, patterns] in items(projectile#navigation_commands())
     call projectile#define_navigation_command(command, patterns)
   endfor
   for [prefix, excmd] in items(s:prefixes)
-    execute 'command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete'
+    execute 'command! -buffer -bar -bang -nargs=* -range=1 -complete=customlist,s:edit_complete'
           \ 'A'.prefix
-          \ ':execute s:edit_command("'.excmd.'<bang>",<f-args>)'
+          \ ':execute s:edit_command("'.excmd.'<bang>", <line2>, <f-args>)'
   endfor
   command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete A AE<bang> <args>
   for [root, makeprg] in projectile#query_exec('make')
@@ -304,10 +310,11 @@ function! s:completion_filter(results, A) abort
   return filtered
 endfunction
 
-function! s:dir_complete(lead, _, __) abort
+function! s:dir_complete(lead, cmdline, _) abort
   let base = substitute(a:lead, '^[\/]', '', '')
   let slash = projectile#slash()
-  let matches = split(glob(projectile#path(substitute(base, '[\/]', '*&',  'g') . '*' . slash)), "\n")
+  let c = matchstr(a:cmdline, '^\d\+')
+  let matches = split(glob(projectile#path(substitute(base, '[\/]', '*&',  'g') . '*' . slash, c ? c : 1)), "\n")
   call map(matches,'matchstr(a:lead, "^[\\/]") . v:val[ strlen(projectile#path())+1 : -1 ]')
   return matches
 endfunction
@@ -388,9 +395,12 @@ endfunction
 
 " Section: :A
 
-function! s:edit_command(cmd, ...) abort
+function! s:edit_command(cmd, count, ...) abort
   if a:0
-    let file = a:1
+    let file = projectile#path(a:1, a:count)
+    if empty(file)
+      return 'echoerr "Invalid count"'
+    endif
   else
     let alternates = projectile#query_file('alternate')
     let warning = get(filter(copy(alternates), 'v:val =~# "replace %.*}"'), 0, '')
@@ -408,9 +418,10 @@ function! s:edit_command(cmd, ...) abort
   return a:cmd . ' ' . fnameescape(file)
 endfunction
 
-function! s:edit_complete(lead, _, __) abort
+function! s:edit_complete(lead, cmdline, _) abort
   let base = substitute(a:lead, '^[\/]', '', '')
-  let matches = split(glob(projectile#path(substitute(base, '[\/]', '*&',  'g') . '*')), "\n")
+  let c = matchstr(a:cmdline, '^\d\+')
+  let matches = split(glob(projectile#path(substitute(base, '[\/]', '*&',  'g') . '*', c ? c : 1)), "\n")
   call map(matches, 'matchstr(a:lead, "^[\\/]") . v:val[ strlen(projectile#path())+1 : -1 ] . (isdirectory(v:val) ? projectile#slash() : "")')
   return matches
 endfunction

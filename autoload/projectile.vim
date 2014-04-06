@@ -24,6 +24,24 @@ function! s:endswith(str, suffix) abort
   return strpart(a:str, len(a:str) - len(a:suffix)) ==# a:suffix
 endfunction
 
+function! s:uniq(list) abort
+  if exists('*uniq')
+    return uniq(a:list)
+  endif
+  let i = 0
+  let seen = {}
+  while i < len(a:list)
+    let str = string(a:list[i])
+    if has_key(seen, str)
+      call remove(a:list, i)
+    else
+      let seen[str] = 1
+      let i += 1
+    endif
+  endwhile
+  return a:list
+endfunction
+
 function! projectile#lencmp(i1, i2) abort
   return len(a:i1) - len(a:i2)
 endfunction
@@ -296,7 +314,7 @@ endfunction
 
 function! s:completion_filter(results, A) abort
   let sep = projectile#slash()
-  let results = sort(copy(a:results))
+  let results = s:uniq(sort(copy(a:results)))
   call filter(results,'v:val !~# "\\~$"')
   let filtered = filter(copy(results),'v:val[0:strlen(a:A)-1] ==# a:A')
   if !empty(filtered) | return filtered | endif

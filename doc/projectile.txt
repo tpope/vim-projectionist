@@ -127,6 +127,13 @@ are available.
                                                 *projectile-:Lcd*
 :Lcd [path]             Like :Cd, but use |:lcd|.
 
+                                                *projectile-:ProjectDo*
+:ProjectDo {cmd}        Change directory to the project root, execute the
+                        given command, and change back.  This won't work if
+                        {cmd} leaves the focus in a different window.  Tab
+                        complete will erroneously reflect the current working
+                        directory, not the project root.
+
 AUTOCOMMANDS                                    *projectile-autocmds*
 
 Projectile.vim dispatches a |User| *ProjectileDetect* event when searching for

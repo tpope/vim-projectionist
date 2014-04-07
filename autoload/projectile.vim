@@ -284,6 +284,8 @@ function! projectile#activate() abort
           \ ':execute s:edit_command("'.excmd.'<bang>", <line2>, <f-args>)'
   endfor
   command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete A AE<bang> <args>
+  command! -buffer -bang -nargs=1 -range=1 -complete=command ProjectDo execute s:do('<bang>', <line2>, <q-args>)
+
   for [root, makeprg] in projectile#query_exec('make')
     unlet! b:current_compiler
     setlocal errorformat<
@@ -395,7 +397,7 @@ function! s:open_projection(cmd, variants, ...) abort
 endfunction
 
 function! s:projection_complete(lead, cmdline, _) abort
-  execute matchstr(a:cmdline, '[' . join(keys(s:prefixes), '') . ']\w\+') . ' &'
+  execute matchstr(a:cmdline, '\a\@<![' . join(keys(s:prefixes), '') . ']\w\+') . ' &'
   let results = []
   for format in s:last_formats
     if format !~# '%s'
@@ -442,6 +444,22 @@ function! s:edit_complete(lead, cmdline, _) abort
   let matches = split(glob(projectile#path(substitute(base, '[\/]', '*&',  'g') . '*', c ? c : 1)), "\n")
   call map(matches, 'matchstr(a:lead, "^[\\/]") . v:val[ strlen(projectile#path())+1 : -1 ] . (isdirectory(v:val) ? projectile#slash() : "")')
   return matches
+endfunction
+
+" Section: :ProjectDo
+
+function! s:do(bang, count, cmd) abort
+  let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
+  let cwd = getcwd()
+  try
+    execute cd fnameescape(projectile#path('', a:count))
+    execute substitute(a:cmd, '\>', a:bang, '')
+  catch
+    return 'echoerr '.string(v:exception)
+  finally
+    execute cd fnameescape(cwd)
+  endtry
+  return ''
 endfunction
 
 " Section: Templates

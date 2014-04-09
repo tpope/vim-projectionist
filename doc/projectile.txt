@@ -63,9 +63,6 @@ The full list of available properties in a projection is as follows:
 "dispatch" ~
         Default task to use for |:Dispatch| in dispatch.vim.  If not provided,
         the option for any existing alternate file is used instead.
-						*projectile-indent*
-"indent" ~
-        Default value for 'shiftwidth'.
 						*projectile-make*
 "make" ~
         Sets 'makeprg'.  Also loads a |:compiler| plugin if one is available

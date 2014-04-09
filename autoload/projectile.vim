@@ -312,9 +312,7 @@ function! projectile#activate() abort
     endif
     unlet dispatch b:dispatch
   endfor
-  for &l:shiftwidth in projectile#query_scalar('indent')
-    break
-  endfor
+
   silent doautocmd User ProjectileActivate
 endfunction
 

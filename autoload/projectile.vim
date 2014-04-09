@@ -289,9 +289,12 @@ function! projectile#activate() abort
   for [root, makeprg] in projectile#query_exec('make')
     unlet! b:current_compiler
     setlocal errorformat<
-    let executable = fnamemodify(matchstr(makeprg, '\S\+'), ':t:r')
-    if !empty(findfile('compiler/'.executable.'.vim', escape(&rtp, ' ')))
-      execute 'compiler '.executable
+    let compiler = fnamemodify(matchstr(makeprg, '\S\+'), ':t:r')
+    if exists(':Dispatch')
+      silent! let compiler = dispatch#compiler_for_program(makeprg)
+    endif
+    if !empty(findfile('compiler/'.compiler.'.vim', escape(&rtp, ' ')))
+      execute 'compiler' compiler
     endif
     let &l:makeprg = makeprg
     break

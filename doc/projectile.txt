@@ -21,7 +21,7 @@ Maven project:
         "command": "test"
       },
       "*.java": {"dispatch": "javac {file}"},
-      "*": {"make": "mvn -f {project}/pom.xml"}
+      "*": {"make": ["mvn", "-f", "{project}/pom.xml"]}
     }
 <
 In property values, "{}" will be replaced by the portion of the glob matched
@@ -62,12 +62,14 @@ The full list of available properties in a projection is as follows:
 						*projectile-dispatch*
 "dispatch" ~
         Default task to use for |:Dispatch| in dispatch.vim.  If not provided,
-        the option for any existing alternate file is used instead.
+        the option for any existing alternate file is used instead.  Set to a
+        list of arguments and they will be shell escaped and joined.
 						*projectile-make*
 "make" ~
         Sets 'makeprg'.  Also loads a |:compiler| plugin if one is available
         matching the executable name.  This is useful to set from a "*"
-        projection.
+        projection.  Set to a list of arguments and they will be shell escaped
+        and joined.
 						*projectile-template*
 "template" ~
         Array of lines to use when creating a new file.

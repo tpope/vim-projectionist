@@ -232,7 +232,7 @@ endfunction
 function! projectile#query_with_alternate(key) abort
   let values = projectile#query(a:key)
   for file in projectile#query_file('alternate')
-    for [root, match] in projectile#query('dispatch', {}, file)
+    for [root, match] in projectile#query(a:key, {}, file)
       if filereadable(file)
         call add(values, [root, match])
       endif
@@ -296,12 +296,18 @@ function! projectile#activate() abort
     let &l:makeprg = makeprg
     break
   endfor
-  for [root, b:start] in projectile#query_exec('start')
+  for [root, command] in projectile#query_exec('start')
+    let offset = index(s:paths(), root[0:-2]) + 1
+    let b:start = ':' . (offset == 1 ? '' : offset) . 'ProjectDo ' .
+          \ substitute('Start '.command, 'Start :', '', '')
     break
   endfor
   for [root, dispatch] in projectile#query_with_alternate('dispatch')
-    let b:dispatch = s:shellcmd(dispatch)
-    if !empty(b:dispatch)
+    let command = s:shellcmd(dispatch)
+    let offset = index(s:paths(), root[0:-2]) + 1
+    if !empty(command)
+      let b:dispatch = ':' . (offset == 1 ? '' : offset) . 'ProjectDo ' .
+            \ substitute('Dispatch '.command, 'Dispatch :', '', '')
       break
     endif
     unlet dispatch b:dispatch

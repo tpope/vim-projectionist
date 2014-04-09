@@ -286,7 +286,11 @@ function! projectile#activate() abort
   command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete A AE<bang> <args>
   command! -buffer -bang -nargs=1 -range=1 -complete=command ProjectDo execute s:do('<bang>', <line2>, <q-args>)
 
-  for [root, makeprg] in projectile#query_exec('make')
+  for [root, makeopt] in projectile#query('make')
+    let makeprg = s:shellcmd(makeopt)
+    if empty(makeprg)
+      continue
+    endif
     unlet! b:current_compiler
     setlocal errorformat<
     let compiler = fnamemodify(matchstr(makeprg, '\S\+'), ':t:r')
@@ -297,14 +301,19 @@ function! projectile#activate() abort
       execute 'compiler' compiler
     endif
     let &l:makeprg = makeprg
+    if type(makeopt) ==# type([]) && empty(filter(copy(makeopt), 'stridx(v:val, root) >= 0'))
+      let &l:errorformat .= ',projectile.vim@'.escape(root, ',')
+    endif
     break
   endfor
+
   for [root, command] in projectile#query_exec('start')
     let offset = index(s:paths(), root[0:-2]) + 1
     let b:start = ':' . (offset == 1 ? '' : offset) . 'ProjectDo ' .
           \ substitute('Start '.command, 'Start :', '', '')
     break
   endfor
+
   for [root, dispatch] in projectile#query_with_alternate('dispatch')
     let command = s:shellcmd(dispatch)
     let offset = index(s:paths(), root[0:-2]) + 1
@@ -468,6 +477,26 @@ function! s:do(bang, count, cmd) abort
   endtry
   return ''
 endfunction
+
+" Section: Make
+
+function! s:qf_pre() abort
+  let dir = substitute(matchstr(&l:errorformat, 'projectile\.vim@\zs\%(\\.\|[^,]\)*'), '\\,' ,',', 'g')
+  if !empty(dir)
+    echomsg 'hi!'
+    let cwd = getcwd()
+    let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
+    execute cd fnameescape(dir)
+    let s:qf_post = cd . ' ' . fnameescape(cwd)
+  endif
+endfunction
+
+augroup projectile_make
+  autocmd!
+  autocmd QuickFixCmdPre  dispatch,make,lmake call s:qf_pre()
+  autocmd QuickFixCmdPost dispatch,make,lmake
+        \ if exists('s:qf_post') | execute remove(s:, 'qf_post') | endif
+augroup END
 
 " Section: Templates
 

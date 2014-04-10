@@ -284,7 +284,7 @@ function! projectile#activate() abort
           \ ':execute s:edit_command("'.excmd.'<bang>", <line2>, <f-args>)'
   endfor
   command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete A AE<bang> <args>
-  command! -buffer -bang -nargs=1 -range=1 -complete=command ProjectDo execute s:do('<bang>', <line2>, <q-args>)
+  command! -buffer -bang -nargs=1 -range=0 -complete=command ProjectDo execute s:do('<bang>', <count>==<line1>?<count>:-1, <q-args>)
 
   for [root, makeopt] in projectile#query('make')
     let makeprg = s:shellcmd(makeopt)
@@ -309,7 +309,7 @@ function! projectile#activate() abort
 
   for [root, command] in projectile#query_exec('start')
     let offset = index(s:paths(), root[0:-2]) + 1
-    let b:start = ':' . (offset == 1 ? '' : offset) . 'ProjectDo ' .
+    let b:start = ':ProjectDo' . (offset == 1 ? '' : offset) . ' ' .
           \ substitute('Start '.command, 'Start :', '', '')
     break
   endfor
@@ -318,7 +318,7 @@ function! projectile#activate() abort
     let command = s:shellcmd(dispatch)
     let offset = index(s:paths(), root[0:-2]) + 1
     if !empty(command)
-      let b:dispatch = ':' . (offset == 1 ? '' : offset) . 'ProjectDo ' .
+      let b:dispatch = ':ProjectDo' . (offset == 1 ? '' : offset) . ' ' .
             \ substitute('Dispatch '.command, 'Dispatch :', '', '')
       break
     endif
@@ -467,9 +467,11 @@ endfunction
 function! s:do(bang, count, cmd) abort
   let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
   let cwd = getcwd()
+  let cmd = substitute(a:cmd, '^\d\+ ', '', '')
+  let offset = cmd ==# a:cmd ? 1 : matchstr(a:cmd, '^\d\+')
   try
-    execute cd fnameescape(projectile#path('', a:count))
-    execute substitute(a:cmd, '\>', a:bang, '')
+    execute cd fnameescape(projectile#path('', offset))
+    execute (a:count >= 0 ? a:count : '').substitute(cmd, '\>', a:bang, '')
   catch
     return 'echoerr '.string(v:exception)
   finally

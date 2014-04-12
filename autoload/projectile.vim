@@ -185,10 +185,10 @@ function! projectile#query(key, ...) abort
   for [path, projections] in s:projectiles()
     let pre = path . projectile#slash()
     let expansions = extend({'project': path, 'file': file}, a:0 ? a:1 : {})
-    if strpart(file, 0, len(path)) !=# path
-      continue
-    endif
     let name = file[strlen(path)+1:-1]
+    if strpart(file, 0, len(path)) !=# path
+      let name = ''
+    endif
     if has_key(projections, name) && has_key(projections[name], a:key)
       call add(candidates, [pre, s:expand_placeholders(projections[name][a:key], expansions)])
     endif

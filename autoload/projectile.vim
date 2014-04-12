@@ -50,6 +50,10 @@ function! projectile#slash() abort
   return exists('+shellslash') && !&shellslash ? '\' : '/'
 endfunction
 
+function! s:slash(str)
+  return tr(a:str, projectile#slash(), '/')
+endfunction
+
 function! projectile#json_parse(string) abort
   let [null, false, true] = ['', 0, 1]
   let string = type(a:string) == type([]) ? join(a:string, ' ') : a:string
@@ -179,14 +183,27 @@ function! s:expand_placeholders(value, expansions) abort
   return value =~# "\001" ? '' : value
 endfunction
 
-let s:valid_key = '^[^*{}]*\*\=[^*{}]*$'
+let s:valid_key = '^\%([^*{}]*\*\*[^*{}]\{2\}\)\=[^*{}]*\*\=[^*{}]*$'
 
 function! s:match(file, pattern) abort
-  let [prefix, suffix; _] = split(a:pattern, '\*', 1)
-  if s:startswith(a:file, prefix) && s:endswith(a:file, suffix)
-    return tr(a:file[strlen(prefix) : -strlen(suffix)-1], projectile#slash(), '/')
+  if a:pattern =~# '^[^*{}]*\*[^*{}]*$'
+    let pattern = s:slash(substitute(a:pattern, '\*', '**/*', ''))
+  elseif a:pattern =~# '^[^*{}]*\*\*[^*{}]\+\*[^*{}]*$'
+    let pattern = s:slash(a:pattern)
+  else
+    return ''
   endif
-  return ''
+  let [prefix, infix, suffix] = split(pattern, '\*\*\=', 1)
+  let file = s:slash(a:file)
+  if !s:startswith(file, prefix) || !s:endswith(file, suffix)
+    return ''
+  endif
+  let match = file[strlen(prefix) : -strlen(suffix)-1]
+  if infix ==# '/'
+    return match
+  endif
+  let clean = substitute('/'.match, '\V'.infix.'\ze\[^/]\*\$', '/', '')[1:-1]
+  return clean ==# match ? '' : clean
 endfunction
 
 function! projectile#query(key, ...) abort
@@ -394,17 +411,20 @@ endfunction
 function! s:open_projection(cmd, variants, ...) abort
   let formats = []
   for variant in a:variants
-    call add(formats, variant[0] . projectile#slash() . substitute(variant[1], '\*', '%s', ''))
+    call add(formats, variant[0] . projectile#slash() . (variant[1] =~# '\*\*'
+          \ ? variant[1] : substitute(variant[1], '\*', '**/*', '')))
   endfor
   if a:0 && a:1 ==# '&'
     let s:last_formats = formats
     return ''
   endif
   if a:0
-    call filter(formats, 'v:val =~# "%s"')
-    call map(formats, 'printf(v:val, a:1)')
+    call filter(formats, 'v:val =~# "\\*"')
+    let dir = matchstr(a:1, '.*\ze/')
+    let base = matchstr(a:1, '[^\/]*$')
+    call map(formats, 'simplify(substitute(substitute(v:val, "\\*\\*", dir, ""), "\\*", base, ""))')
   else
-    call filter(formats, 'v:val !~# "%s"')
+    call filter(formats, 'v:val !~# "\\*"')
   endif
   if empty(formats)
     return 'echoerr "Invalid number of arguments"'
@@ -425,15 +445,10 @@ function! s:projection_complete(lead, cmdline, _) abort
   execute matchstr(a:cmdline, '\a\@<![' . join(keys(s:prefixes), '') . ']\w\+') . ' &'
   let results = []
   for format in s:last_formats
-    if format !~# '%s'
+    if format !~# '\*'
       continue
     endif
-    let [before, after] = split(format, '%s', 1)
-    let dir = matchstr(before,'.*/')
-    let prefix = matchstr(before,'.*/\zs.*')
-    let matches = split(glob(dir . '**/*' . after), "\n")
-    call filter(matches, 'v:val[strlen(dir) : strlen(before)-1] ==# prefix')
-    let results += map(matches, 'v:val[strlen(before) : -strlen(after)-1]')
+    let results += map(split(glob(format), "\n"), 's:match(v:val, format)')
   endfor
   return s:completion_filter(results, a:lead)
 endfunction

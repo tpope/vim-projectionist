@@ -216,7 +216,7 @@ function! projectile#query_file(key) abort
   let files = []
   let _ = {}
   for [root, _.match] in projectile#query(a:key)
-    call extend(files, map(type(_.match) == type([]) ? copy(_.match) : [_.match], 'root . v:val'))
+    call extend(files, map(type(_.match) == type([]) ? copy(_.match) : [_.match], 'simplify(root . v:val)'))
   endfor
   return files
 endfunction

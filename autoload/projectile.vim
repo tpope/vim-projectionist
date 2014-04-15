@@ -184,7 +184,7 @@ let s:valid_key = '^[^*{}]*\*\=[^*{}]*$'
 function! s:match(file, pattern) abort
   let [prefix, suffix; _] = split(a:pattern, '\*', 1)
   if s:startswith(a:file, prefix) && s:endswith(a:file, suffix)
-    return tr(name[strlen(prefix) : -strlen(suffix)-1], projectile#slash(), '/')
+    return tr(a:file[strlen(prefix) : -strlen(suffix)-1], projectile#slash(), '/')
   endif
   return ''
 endfunction

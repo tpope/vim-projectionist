@@ -46,6 +46,10 @@ project        absolute path to project
 open           literal {
 close          literal }
 
+From a globbing perspective, "*" is actually a stand in for "**/*".  For
+advanced cases, you can include both globs explicitly: "test/**/test_*.rb".
+When expanding with {}, the inner portion is collapsed to a single slash.
+
 The full list of available properties in a projection is as follows:
 
 						*projectile-alternate*

@@ -20,7 +20,7 @@ Maven project:
         "alternate": "src/main/java/{}.java",
         "command": "test"
       },
-      "*.java": {"dispatch": "javac {file}"},
+      "*.java": {"dispatch": ["javac", "{file}"]},
       "*": {"make": ["mvn", "-f", "{project}/pom.xml"]}
     }
 <
@@ -72,6 +72,13 @@ The full list of available properties in a projection is as follows:
 "make" ~
         Sets 'makeprg'.  Also loads a |:compiler| plugin if one is available
         matching the executable name.  This is useful to set from a "*"
+        projection.  Set to a list of arguments and they will be shell escaped
+        and joined.
+						*projectile-dispatch*
+"start" ~
+        Command to run to "boot" the project.  Examples include `lein run`,
+        `rails server`, and `foreman start`.  It will be used as a default
+        task for |:Start| in dispatch.vim.  This is useful to set from a "*"
         projection.  Set to a list of arguments and they will be shell escaped
         and joined.
 						*projectile-template*

@@ -65,8 +65,8 @@ endfunction
 augroup projectile
   autocmd!
   autocmd FileType *
-        \ if &buftype !~# 'nofile\|quickfix' |
-        \   call ProjectileDetect(expand('<afile>:p')) |
+        \ if &filetype ==# 'netrw' || &buftype !~# 'nofile\|quickfix' |
+        \   call ProjectileDetect(expand('%:p')) |
         \  endif
   autocmd BufFilePost * call ProjectileDetect(expand('<afile>:p'))
   autocmd BufNewFile,BufReadPost *

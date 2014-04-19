@@ -206,25 +206,37 @@ function! s:match(file, pattern) abort
   return clean ==# match ? '' : clean
 endfunction
 
-function! projectile#query(key, ...) abort
+function! projectile#query_raw(key, ...) abort
   let candidates = []
-  let file = a:0 > 1 ? a:2 : expand('%:p')
+  let file = a:0 ? a:1 : expand('%:p')
   for [path, projections] in s:projectiles()
     let pre = path . projectile#slash()
-    let expansions = extend({'project': path, 'file': file}, a:0 ? a:1 : {})
+    let attrs = {'project': path, 'file': file}
     let name = file[strlen(path)+1:-1]
     if strpart(file, 0, len(path)) !=# path
       let name = ''
     endif
     if has_key(projections, name) && has_key(projections[name], a:key)
-      call add(candidates, [pre, s:expand_placeholders(projections[name][a:key], expansions)])
+      call add(candidates, [projections[name][a:key], attrs])
     endif
     for pattern in reverse(sort(filter(keys(projections), 'v:val =~# s:valid_key && v:val =~# "\\*"'), function('projectile#lencmp')))
-      let expansions.match = s:match(name, pattern)
-      if (!empty(expansions.match) || pattern ==# '*') && has_key(projections[pattern], a:key)
-        call add(candidates, [pre, s:expand_placeholders(projections[pattern][a:key], expansions)])
+      let match = s:match(name, pattern)
+      if (!empty(match) || pattern ==# '*') && has_key(projections[pattern], a:key)
+        let expansions = extend({'match': match}, attrs)
+        call add(candidates, [projections[pattern][a:key], expansions])
       endif
     endfor
+  endfor
+  return candidates
+endfunction
+
+function! projectile#query(key, ...) abort
+  let candidates = []
+  let file = a:0 > 1 ? a:2 : expand('%:p')
+  for [value, expansions] in projectile#query_raw(a:key, file)
+    call extend(expansions, a:0 ? a:1 : {})
+    call add(candidates, [expansions.project . projectile#slash(), s:expand_placeholders(value, expansions)])
+    unlet value
   endfor
   return candidates
 endfunction

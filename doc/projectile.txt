@@ -73,7 +73,7 @@ The full list of available properties in a projection is as follows:
         matching the executable name.  This is useful to set from a "*"
         projection.  Set to a list of arguments and they will be shell escaped
         and joined.
-						*projectile-dispatch*
+						*projectile-start*
 "start" ~
         Command to run to "boot" the project.  Examples include `lein run`,
         `rails server`, and `foreman start`.  It will be used as a default

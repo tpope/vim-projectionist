@@ -339,7 +339,7 @@ function! projectile#activate() abort
       execute 'compiler' compiler
     endif
     let &l:makeprg = makeprg
-    if type(makeopt) ==# type([]) && empty(filter(copy(makeopt), 'stridx(v:val, root) >= 0'))
+    if !(type(makeopt) ==# type([]) && !empty(filter(copy(makeopt), 'stridx(v:val, root) >= 0')))
       let &l:errorformat .= ',projectile.vim@'.escape(root, ',')
     endif
     break

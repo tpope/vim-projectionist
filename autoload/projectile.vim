@@ -129,7 +129,7 @@ function! g:projectile_transformations.camelcase(input, o) abort
 endfunction
 
 function! g:projectile_transformations.capitalize(input, o) abort
-  return a:input
+  return substitute(a:input, '\%(^\|/\)\zs\(.\)', '\u\1', 'g')
 endfunction
 
 function! g:projectile_transformations.dirname(input, o) abort

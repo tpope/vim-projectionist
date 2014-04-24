@@ -445,6 +445,7 @@ function! s:open_projection(cmd, variants, ...) abort
   for format in formats
     if filereadable(format)
       let target = format
+      break
     endif
   endfor
   if !isdirectory(fnamemodify(target, ':h'))

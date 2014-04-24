@@ -1,7 +1,7 @@
 " Location:     plugin/projectile.vim
 " Author:       Tim Pope <http://tpo.pe/>
 
-if exists("g:loaded_projectile") || v:version < 700 || &cp
+if exists("g:loaded_projectile") || v:version < 700 || !empty(findfile('plugin/projectionist.vim', &rtp))
   finish
 endif
 let g:loaded_projectile = 1

@@ -364,6 +364,7 @@ function! projectile#activate() abort
   endfor
 
   silent doautocmd User ProjectileActivate
+  silent doautocmd User ProjectionistActivate
 endfunction
 
 " Section: Completion

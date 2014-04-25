@@ -29,15 +29,15 @@ function! ProjectileDetect(path) abort
   while root !=# previous
     if s:has(root, '.projections.json')
       try
-        let value = projectile#json_parse(readfile(root.'/.projections.json'))
-        call projectile#append(root, value)
+        let value = projectionist#json_parse(readfile(root.'/.projections.json'))
+        call projectionist#append(root, value)
       catch /^invalid JSON:/
       endtry
     endif
     for [key, value] in items(g:projectiles)
       for test in split(key, '|')
         if empty(filter(split(test, '&'), '!s:has(root, v:val)'))
-          call projectile#append(root, value)
+          call projectionist#append(root, value)
           break
         endif
       endfor
@@ -62,7 +62,7 @@ function! ProjectileDetect(path) abort
   endtry
 
   if !empty(b:projectiles)
-    call projectile#activate()
+    call projectionist#activate()
   endif
 endfunction
 
@@ -87,6 +87,6 @@ augroup projectile
   autocmd BufWritePost .projections.json call ProjectileDetect(expand('<afile>:p'))
   autocmd BufNewFile *
         \ if !empty(b:projectiles) |
-        \   call projectile#apply_template() |
+        \   call projectionist#apply_template() |
         \ endif
 augroup END

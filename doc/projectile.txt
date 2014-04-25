@@ -165,7 +165,7 @@ pattern may prove useful:
 
     function! s:activate() abort
       for [root, value] in projectile#query('wrap')
-        let &textwidth = value
+        let &l:textwidth = value
         break
       endfor
     endfunction

@@ -70,7 +70,7 @@ endfunction
 " Section: Querying
 
 function! s:paths() abort
-  return reverse(sort(keys(b:projectiles), function('projectionist#lencmp')))
+  return reverse(sort(keys(b:projectionist), function('projectionist#lencmp')))
 endfunction
 
 function! projectionist#path(...) abort
@@ -85,7 +85,7 @@ endfunction
 function! s:all() abort
   let all = []
   for key in s:paths()
-    for value in b:projectiles[key]
+    for value in b:projectionist[key]
       call add(all, [key, value])
     endfor
   endfor
@@ -283,10 +283,10 @@ endfunction
 " Section: Activation
 
 function! projectionist#append(root, ...) abort
-  if !has_key(b:projectiles, a:root)
-    let b:projectiles[a:root] = []
+  if !has_key(b:projectionist, a:root)
+    let b:projectionist[a:root] = []
   endif
-  call add(b:projectiles[a:root], get(a:000, -1, {}))
+  call add(b:projectionist[a:root], get(a:000, -1, {}))
 endfunction
 
 function! projectionist#define_navigation_command(command, patterns)
@@ -306,7 +306,7 @@ function! s:shellcmd(arg) abort
 endfunction
 
 function! projectionist#activate() abort
-  if empty(b:projectiles)
+  if empty(b:projectionist)
     finish
   endif
   command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Cd

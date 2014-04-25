@@ -21,7 +21,7 @@ function! s:has(root, file) abort
 endfunction
 
 function! ProjectileDetect(path) abort
-  let b:projectiles = {}
+  let b:projectionist = {}
   let file = simplify(fnamemodify(a:path, ':p:s?[\/]$??'))
 
   let root = file
@@ -61,7 +61,7 @@ function! ProjectileDetect(path) abort
     unlet! g:projectionist_file
   endtry
 
-  if !empty(b:projectiles)
+  if !empty(b:projectionist)
     call projectionist#activate()
   endif
 endfunction
@@ -86,7 +86,7 @@ augroup projectile
         \ endif
   autocmd BufWritePost .projections.json call ProjectileDetect(expand('<afile>:p'))
   autocmd BufNewFile *
-        \ if !empty(b:projectiles) |
+        \ if !empty(b:projectionist) |
         \   call projectionist#apply_template() |
         \ endif
 augroup END

@@ -1,10 +1,10 @@
-" Location:     plugin/projectile.vim
+" Location:     plugin/projectionist.vim
 " Author:       Tim Pope <http://tpo.pe/>
 
-if exists("g:loaded_projectile") || v:version < 700 || !empty(findfile('plugin/projectionist.vim', &rtp))
+if exists("g:loaded_projectionist") || v:version < 700 || &cp
   finish
 endif
-let g:loaded_projectile = 1
+let g:loaded_projectionist = 1
 
 if !exists('g:projectiles')
   let g:projectiles = {}
@@ -20,7 +20,7 @@ function! s:has(root, file) abort
   endif
 endfunction
 
-function! ProjectileDetect(path) abort
+function! ProjectionistDetect(path) abort
   let b:projectionist = {}
   let file = simplify(fnamemodify(a:path, ':p:s?[\/]$??'))
 
@@ -50,10 +50,10 @@ function! ProjectileDetect(path) abort
     let g:projectile_file = file
     let g:projectionist_file = file
     if v:version + has('patch438') >= 704
-      silent doautocmd <nomodeline> User ProjectileDetect
+      silent doautocmd <nomodeline> User ProjectionistDetect
       silent doautocmd <nomodeline> User ProjectionistDetect
     else
-      silent doautocmd User ProjectileDetect
+      silent doautocmd User ProjectionistDetect
       silent doautocmd User ProjectionistDetect
     endif
   finally
@@ -66,25 +66,25 @@ function! ProjectileDetect(path) abort
   endif
 endfunction
 
-augroup projectile
+augroup projectionist
   autocmd!
   autocmd FileType *
         \ if &filetype ==# 'netrw' || &buftype !~# 'nofile\|quickfix' |
-        \   call ProjectileDetect(expand('%:p')) |
+        \   call ProjectionistDetect(expand('%:p')) |
         \  endif
-  autocmd BufFilePost * call ProjectileDetect(expand('<afile>:p'))
+  autocmd BufFilePost * call ProjectionistDetect(expand('<afile>:p'))
   autocmd BufNewFile,BufReadPost *
         \ if empty(&filetype) |
-        \   call ProjectileDetect(expand('<afile>:p')) |
+        \   call ProjectionistDetect(expand('<afile>:p')) |
         \ endif
-  autocmd CmdWinEnter * call ProjectileDetect(expand('#:p'))
+  autocmd CmdWinEnter * call ProjectionistDetect(expand('#:p'))
   autocmd User NERDTreeInit,NERDTreeNewRoot
-        \ call ProjectileDetect(b:NERDTreeRoot.path.str())
+        \ call ProjectionistDetect(b:NERDTreeRoot.path.str())
   autocmd VimEnter *
         \ if empty(expand('<afile>:p')) |
-        \   call ProjectileDetect(getcwd()) |
+        \   call ProjectionistDetect(getcwd()) |
         \ endif
-  autocmd BufWritePost .projections.json call ProjectileDetect(expand('<afile>:p'))
+  autocmd BufWritePost .projections.json call ProjectionistDetect(expand('<afile>:p'))
   autocmd BufNewFile *
         \ if !empty(b:projectionist) |
         \   call projectionist#apply_template() |

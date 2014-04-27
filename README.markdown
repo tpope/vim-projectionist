@@ -1,6 +1,6 @@
-# projectile.vim
+# projectionist.vim
 
-Projectile is a general purpose plugin based on "projections" from
+Projectionist is a general purpose plugin based on "projections" from
 [rails.vim][].  What are projections?  Let's start with an example.
 
 ## Example
@@ -24,7 +24,8 @@ Here's what a couple of them look like:
                     └── sentience.bash
 
 As you can see, rbenv plugins have hooks in `etc/rbenv.d/` and commands in
-`bin/` matching `rbenv-*`.  Here's a projectile configuration for that setup:
+`bin/` matching `rbenv-*`.  Here's a projectionist configuration for that
+setup:
 
     let g:projectiles = {
           \   "etc/rbenv.d/|bin/rbenv-*": {
@@ -48,7 +49,7 @@ creates an `:Ehook` command.
 
 ## Features
 
-See `:help projectile` for the authoritative documentation.  Here are some
+See `:help projectionist` for the authoritative documentation.  Here are some
 highlights.
 
 ### Global and per project projection definitions
@@ -70,10 +71,10 @@ Here are some examples for this very project:
       "README.markdown": {"command": "doc"}
     }
 
-With these in place, you could use `:Eplugin projectile` to edit
-`plugin/projectile.vim` and `:Edoc projectile` to edit `doc/projectile.txt`.
-For `README.markdown`, since there's no glob, it becomes the default
-destination for `:Edoc` if no argument is given.
+With these in place, you could use `:Eplugin projectionist` to edit
+`plugin/projectionist.vim` and `:Edoc projectionist` to edit
+`doc/projectionist.txt`.  For `README.markdown`, since there's no glob, it
+becomes the default destination for `:Edoc` if no argument is given.
 
 The `E` stands for `edit`.  You also get `S`, `V`, and `T` variants that
 `split`, `vsplit`, and `tabedit`.
@@ -84,7 +85,7 @@ approach when there are multiple categories of similarly named files.)
 
 ### Alternate files
 
-Projectile provides `:A`, `:AS`, `:AV`, and `:AT` to jump to an "alternate"
+Projectionist provides `:A`, `:AS`, `:AV`, and `:AT` to jump to an "alternate"
 file, based on ye olde convention originally established in [a.vim][].  Here's
 an example configuration for Maven that allows you to jump between the
 implementation and test:
@@ -121,7 +122,7 @@ installing [pathogen.vim](https://github.com/tpope/vim-pathogen), and
 then simply copy and paste:
 
     cd ~/.vim/bundle
-    git clone git://github.com/tpope/vim-projectile.git
+    git clone git://github.com/tpope/vim-projectionist.git
 
 ## FAQ
 

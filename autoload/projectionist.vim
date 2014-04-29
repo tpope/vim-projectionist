@@ -522,8 +522,8 @@ endfunction
 
 function! s:qf_pre() abort
   let dir = substitute(matchstr(&l:errorformat, 'projectionist\.vim@\zs\%(\\.\|[^,]\)*'), '\\,' ,',', 'g')
-  if !empty(dir)
-    let cwd = getcwd()
+  let cwd = getcwd()
+  if !empty(dir) && dir !=# cwd
     let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
     execute cd fnameescape(dir)
     let s:qf_post = cd . ' ' . fnameescape(cwd)

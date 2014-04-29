@@ -435,7 +435,7 @@ function! s:open_projection(cmd, variants, ...) abort
     call filter(formats, 'v:val =~# "\\*"')
     let dir = matchstr(a:1, '.*\ze/')
     let base = matchstr(a:1, '[^\/]*$')
-    call map(formats, 'simplify(substitute(substitute(v:val, "\\*\\*[\\/]\\=", dir, ""), "\\*", base, ""))')
+    call map(formats, 'substitute(substitute(v:val, "\\*\\*\\([\\/]\\=\\)", empty(dir) ? "" : dir . "\\1", ""), "\\*", base, "")')
   else
     call filter(formats, 'v:val !~# "\\*"')
   endif

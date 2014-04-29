@@ -51,10 +51,10 @@ function! ProjectionistDetect(path) abort
     let g:projectionist_file = file
     let b:projectionist_file = file
     if v:version + has('patch438') >= 704
-      silent doautocmd <nomodeline> User ProjectionistDetect
+      silent doautocmd <nomodeline> User ProjectileDetect
       silent doautocmd <nomodeline> User ProjectionistDetect
     else
-      silent doautocmd User ProjectionistDetect
+      silent doautocmd User ProjectileDetect
       silent doautocmd User ProjectionistDetect
     endif
   finally

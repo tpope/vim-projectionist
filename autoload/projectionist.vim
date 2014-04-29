@@ -340,7 +340,7 @@ function! projectionist#activate() abort
     endif
     let &l:makeprg = makeprg
     if !(type(makeopt) ==# type([]) && !empty(filter(copy(makeopt), 'stridx(v:val, root) >= 0')))
-      let &l:errorformat .= ',projectionist.vim@'.escape(root, ',')
+      let &l:errorformat .= ',chdir '.escape(root, ',')
     endif
     break
   endfor
@@ -521,7 +521,7 @@ endfunction
 " Section: Make
 
 function! s:qf_pre() abort
-  let dir = substitute(matchstr(&l:errorformat, 'projectionist\.vim@\zs\%(\\.\|[^,]\)*'), '\\,' ,',', 'g')
+  let dir = substitute(matchstr(','.&l:errorformat, ',chdir \zs\%(\\.\|[^,]\)*'), '\\,' ,',', 'g')
   let cwd = getcwd()
   if !empty(dir) && dir !=# cwd
     let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'

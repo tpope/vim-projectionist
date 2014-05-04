@@ -533,8 +533,8 @@ endfunction
 
 augroup projectionist_make
   autocmd!
-  autocmd QuickFixCmdPre  dispatch,make,lmake call s:qf_pre()
-  autocmd QuickFixCmdPost dispatch,make,lmake
+  autocmd QuickFixCmdPre  dispatch,*make call s:qf_pre()
+  autocmd QuickFixCmdPost dispatch,*make
         \ if exists('s:qf_post') | execute remove(s:, 'qf_post') | endif
 augroup END
 

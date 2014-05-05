@@ -347,7 +347,7 @@ function! projectionist#activate() abort
 
   for [root, command] in projectionist#query_exec('start')
     let offset = index(s:paths(), root[0:-2]) + 1
-    let b:start = ':ProjectDo ' . (offset == 1 ? '' : offset) . ' ' .
+    let b:start = ':ProjectDo ' . (offset == 1 ? '' : offset.' ') .
           \ substitute('Start '.command, 'Start :', '', '')
     break
   endfor
@@ -356,7 +356,7 @@ function! projectionist#activate() abort
     let command = s:shellcmd(dispatch)
     let offset = index(s:paths(), root[0:-2]) + 1
     if !empty(command)
-      let b:dispatch = ':ProjectDo ' . (offset == 1 ? '' : offset) . ' ' .
+      let b:dispatch = ':ProjectDo ' . (offset == 1 ? '' : offset.' ') .
             \ substitute('Dispatch '.command, 'Dispatch :', '', '')
       break
     endif

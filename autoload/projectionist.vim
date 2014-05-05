@@ -235,7 +235,7 @@ function! projectionist#query(key, ...) abort
   let file = a:0 > 1 ? a:2 : expand('%:p')
   for [value, expansions] in projectionist#query_raw(a:key, file)
     call extend(expansions, a:0 ? a:1 : {})
-    call add(candidates, [expansions.project . projectionist#slash(), s:expand_placeholders(value, expansions)])
+    call add(candidates, [expansions.project, s:expand_placeholders(value, expansions)])
     unlet value
   endfor
   return candidates
@@ -245,7 +245,7 @@ function! projectionist#query_file(key) abort
   let files = []
   let _ = {}
   for [root, _.match] in projectionist#query(a:key)
-    call extend(files, map(type(_.match) == type([]) ? copy(_.match) : [_.match], 'simplify(root . v:val)'))
+    call extend(files, map(type(_.match) == type([]) ? copy(_.match) : [_.match], 'simplify(root . projectionist#slash() . v:val)'))
   endfor
   return files
 endfunction

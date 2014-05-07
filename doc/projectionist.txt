@@ -48,7 +48,9 @@ close          literal }
 
 From a globbing perspective, "*" is actually a stand in for "**/*".  For
 advanced cases, you can include both globs explicitly: "test/**/test_*.rb".
-When expanding with {}, the inner portion is collapsed to a single slash.
+When expanding with {}, the ** and * portions are joined with a slash.  If
+necessary, the dirname and basename expansions can be used to split the value
+back apart.
 
 The full list of available properties in a projection is as follows:
 

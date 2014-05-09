@@ -232,9 +232,9 @@ endfunction
 
 function! projectionist#query(key, ...) abort
   let candidates = []
-  let file = a:0 > 1 ? a:2 : expand('%:p')
+  let file = a:0 > 1 ? a:2 : get(a:0 ? a:1 : {}, 'file', expand('%:p'))
   for [value, expansions] in projectionist#query_raw(a:key, file)
-    call extend(expansions, a:0 ? a:1 : {})
+    call extend(expansions, a:0 ? a:1 : {}, 'keep')
     call add(candidates, [expansions.project, s:expand_placeholders(value, expansions)])
     unlet value
   endfor
@@ -250,8 +250,8 @@ function! projectionist#query_file(key) abort
   return files
 endfunction
 
-function! projectionist#query_exec(key) abort
-  return filter(map(projectionist#query(a:key), '[v:val[0], s:shellcmd(v:val[1])]'), '!empty(v:val[1])')
+function! projectionist#query_exec(key, ...) abort
+  return filter(map(projectionist#query(a:key, a:0 ? a:1 : {}), '[v:val[0], s:shellcmd(v:val[1])]'), '!empty(v:val[1])')
 endfunction
 
 function! projectionist#query_scalar(key) abort
@@ -267,10 +267,10 @@ function! projectionist#query_scalar(key) abort
   return values
 endfunction
 
-function! projectionist#query_with_alternate(key) abort
-  let values = projectionist#query(a:key)
+function! s:query_exec_with_alternate(key) abort
+  let values = projectionist#query_exec(a:key)
   for file in projectionist#query_file('alternate')
-    for [root, match] in projectionist#query(a:key, {}, file)
+    for [root, match] in projectionist#query_exec(a:key, {'file': file})
       if filereadable(file)
         call add(values, [root, match])
       endif
@@ -352,15 +352,11 @@ function! projectionist#activate() abort
     break
   endfor
 
-  for [root, dispatch] in projectionist#query_with_alternate('dispatch')
-    let command = s:shellcmd(dispatch)
+  for [root, command] in s:query_exec_with_alternate('dispatch')
     let offset = index(s:paths(), root) + 1
-    if !empty(command)
-      let b:dispatch = ':ProjectDo ' . (offset == 1 ? '' : offset.' ') .
-            \ substitute('Dispatch '.command, 'Dispatch :', '', '')
-      break
-    endif
-    unlet dispatch b:dispatch
+    let b:dispatch = ':ProjectDo ' . (offset == 1 ? '' : offset.' ') .
+          \ substitute('Dispatch '.command, 'Dispatch :', '', '')
+    break
   endfor
 
   silent doautocmd User ProjectileActivate

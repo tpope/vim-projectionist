@@ -24,6 +24,7 @@ endfunction
 
 function! ProjectionistDetect(path) abort
   let b:projectionist = {}
+  unlet! b:projectionist_file
   let file = simplify(fnamemodify(a:path, ':p:s?[\/]$??'))
 
   let root = file
@@ -51,7 +52,6 @@ function! ProjectionistDetect(path) abort
   try
     let g:projectile_file = file
     let g:projectionist_file = file
-    let b:projectionist_file = file
     if v:version + has('patch438') >= 704
       silent doautocmd <nomodeline> User ProjectileDetect
       silent doautocmd <nomodeline> User ProjectionistDetect
@@ -62,7 +62,6 @@ function! ProjectionistDetect(path) abort
   finally
     unlet! g:projectile_file
     unlet! g:projectionist_file
-    unlet! b:projectionist_file
   endtry
 
   if !empty(b:projectionist)

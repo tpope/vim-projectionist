@@ -49,17 +49,15 @@ function! ProjectionistDetect(path) abort
     let root = fnamemodify(root, ':h')
   endwhile
 
+  let modelines = &modelines
   try
+    set modelines=0
     let g:projectile_file = file
     let g:projectionist_file = file
-    if v:version + has('patch438') >= 704
-      silent doautocmd <nomodeline> User ProjectileDetect
-      silent doautocmd <nomodeline> User ProjectionistDetect
-    else
-      silent doautocmd User ProjectileDetect
-      silent doautocmd User ProjectionistDetect
-    endif
+    silent doautocmd User ProjectileDetect
+    silent doautocmd User ProjectionistDetect
   finally
+    let &modelines = modelines
     unlet! g:projectile_file
     unlet! g:projectionist_file
   endtry

@@ -208,7 +208,7 @@ endfunction
 
 function! projectionist#query_raw(key, ...) abort
   let candidates = []
-  let file = a:0 ? a:1 : expand('%:p')
+  let file = a:0 ? a:1 : get(b:, 'projectionist_file', expand('%:p'))
   for [path, projections] in s:all()
     let pre = path . projectionist#slash()
     let attrs = {'project': path, 'file': file}
@@ -232,7 +232,7 @@ endfunction
 
 function! projectionist#query(key, ...) abort
   let candidates = []
-  let file = a:0 > 1 ? a:2 : get(a:0 ? a:1 : {}, 'file', expand('%:p'))
+  let file = a:0 > 1 ? a:2 : get(a:0 ? a:1 : {}, 'file', get(b:, 'projectionist_file', expand('%:p')))
   for [value, expansions] in projectionist#query_raw(a:key, file)
     call extend(expansions, a:0 ? a:1 : {}, 'keep')
     call add(candidates, [expansions.project, s:expand_placeholders(value, expansions)])

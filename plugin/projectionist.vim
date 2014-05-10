@@ -11,13 +11,15 @@ if !exists('g:projectiles')
 endif
 
 function! s:has(root, file) abort
-  if a:file =~# '\*'
-    return !empty(glob(a:root . '/' . a:file))
-  elseif a:file =~# '/$'
-    return isdirectory(a:root . '/' . a:file)
+  let file = matchstr(a:file, '[^!].*')
+  if file =~# '\*'
+    let found = !empty(glob(a:root . '/' . file))
+  elseif file =~# '/$'
+    let found = isdirectory(a:root . '/' . file)
   else
-    return filereadable(a:root . '/' . a:file)
+    let found = filereadable(a:root . '/' . file)
   endif
+  return a:file =~# '^!' ? !found : found
 endfunction
 
 function! ProjectionistDetect(path) abort

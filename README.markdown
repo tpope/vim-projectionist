@@ -30,10 +30,10 @@ setup:
     let g:projectiles = {
           \   "etc/rbenv.d/|bin/rbenv-*": {
           \     "bin/rbenv-*": {
-          \        "command": "command",
+          \        "type": "command",
           \        "template": ["#!/usr/bin/env bash"],
           \     },
-          \     "etc/rbenv.d/*.bash": {"command": "hook"}
+          \     "etc/rbenv.d/*.bash": {"type": "hook"}
           \   }
           \ }
 
@@ -65,10 +65,10 @@ Navigation commands encapsulate editing filenames matching certain patterns.
 Here are some examples for this very project:
 
     {
-      "plugin/*.vim": {"command": "plugin"},
-      "autoload/*.vim": {"command": "autoload"},
-      "doc/*.txt": {"command": "doc"},
-      "README.markdown": {"command": "doc"}
+      "plugin/*.vim": {"type": "plugin"},
+      "autoload/*.vim": {"type": "autoload"},
+      "doc/*.txt": {"type": "doc"},
+      "README.markdown": {"type": "doc"}
     }
 
 With these in place, you could use `:Eplugin projectionist` to edit

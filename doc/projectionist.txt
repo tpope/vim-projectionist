@@ -14,11 +14,11 @@ Maven project:
     {
       "src/main/java/*.java": {
         "alternate": "src/test/java/{}.java",
-        "command": "source"
+        "type": "source"
       },
       "src/test/java/*.java": {
         "alternate": "src/main/java/{}.java",
-        "command": "test"
+        "type": "test"
       },
       "*.java": {"dispatch": ["javac", "{file}"]},
       "*": {"make": ["mvn", "-f", "{project}/pom.xml"]}
@@ -58,13 +58,6 @@ The full list of available properties in a projection is as follows:
 "alternate" ~
         Determines the destination of the |projectionist-:A| command.  If this
         is a list, the first readable file will be used.
-						*projectionist-command*
-"command" ~
-        Names a family of navigation commands to be created.  Use the same
-        name on multiple projections to combine them into a single command.
-        If this option is provided for a literal filename rather than a glob,
-        it is used as the default destination of the navigation command when
-        no argument is given.
 						*projectionist-dispatch*
 "dispatch" ~
         Default task to use for |:Dispatch| in dispatch.vim.  If not provided,
@@ -83,6 +76,12 @@ The full list of available properties in a projection is as follows:
         task for |:Start| in dispatch.vim.  This is useful to set from a "*"
         projection.  Set to a list of arguments and they will be shell escaped
         and joined.
+						*projectionist-type*
+"type" ~
+        Declares the type of file and navigation command it belongs to.  If
+        this option is provided for a literal filename rather than a glob, it
+        is used as the default destination of the navigation command when no
+        argument is given.
 						*projectionist-template*
 "template" ~
         Array of lines to use when creating a new file.
@@ -102,11 +101,11 @@ named etc/rbenv.d/ or one or more files matching the glob bin/rbenv-*.
 >
     let g:projectiles = {
           \ "lib/heroku/&init.rb": {
-          \   "lib/heroku/command/*.rb": {"command": "command"}
+          \   "lib/heroku/command/*.rb": {"type": "command"}
           \ },
           \ "etc/rbenv.d/|bin/rbenv-*": {
-          \   "bin/rbenv-*": {"command": "command"},
-          \   "etc/rbenv.d/*.bash": {"command": "hook"}
+          \   "bin/rbenv-*": {"type": "command"},
+          \   "etc/rbenv.d/*.bash": {"type": "hook"}
           \ }}
 
 Note the use of VimScript |line-continuation|.

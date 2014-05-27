@@ -480,7 +480,12 @@ function! s:edit_command(cmd, count, ...) abort
     endif
     let file = get(filter(copy(alternates), '!empty(getftype(v:val))'), 0, '')
     if empty(file)
-      return 'echoerr "No alternate file"'
+      let choice = confirm("No alternate file. Create?", "&Yes\n&No", 2, "Question")
+      if choice == 1
+        return a:cmd . ' ' . fnameescape(alternates[0])
+      else
+        return 'echoerr "No alternate file"'
+      endif
     endif
   endif
   if !isdirectory(fnamemodify(file, ':h'))

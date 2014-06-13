@@ -366,6 +366,10 @@ endfunction
 " Section: Completion
 
 function! projectionist#completion_filter(results, query, sep, ...) abort
+  if a:query =~# '\*'
+    let regex = s:gsub(a:A, '\*', '.*')
+    return filter(results,'v:val =~# "^".regex')
+  endif
 
   let C = get(g:, 'projectionist_completion_filter')
   if type(C) == type({}) && has_key(C, 'Apply')

@@ -365,19 +365,28 @@ endfunction
 
 " Section: Completion
 
-function! s:completion_filter(results, A) abort
-  let sep = projectionist#slash()
+function! projectionist#completion_filter(results, query, sep, ...) abort
+
+  let C = get(g:, 'projectionist_completion_filter')
+  if type(C) == type({}) && has_key(C, 'Apply')
+    return call(C.Apply, [a:results, a:query, a:sep, a:0 ? a:1 : {}], C)
+  elseif type(C) == type('') && exists('*'.C)
+    return call(C, [a:results, a:query, a:sep, a:0 ? a:1 : {}])
+  endif
+
   let results = s:uniq(sort(copy(a:results)))
   call filter(results,'v:val !~# "\\~$"')
-  let filtered = filter(copy(results),'v:val[0:strlen(a:A)-1] ==# a:A')
+  let filtered = filter(copy(results),'v:val[0:strlen(a:query)-1] ==# a:query')
   if !empty(filtered) | return filtered | endif
-  let regex = s:gsub(a:A,'[^'.sep.']','[&].*')
-  let filtered = filter(copy(results),'v:val =~# "^".regex')
-  if !empty(filtered) | return filtered | endif
-  let filtered = filter(copy(results),'sep.v:val =~# ''['.sep.']''.regex')
-  if !empty(filtered) | return filtered | endif
-  let regex = s:gsub(a:A,'.','[&].*')
-  let filtered = filter(copy(results),'sep.v:val =~# regex')
+  if !empty(a:sep)
+    let regex = s:gsub(a:query,'[^'.a:sep.']','[&].*')
+    let filtered = filter(copy(results),'v:val =~# "^".regex')
+    if !empty(filtered) | return filtered | endif
+    let filtered = filter(copy(results),'a:sep.v:val =~# ''['.a:sep.']''.regex')
+    if !empty(filtered) | return filtered | endif
+  endif
+  let regex = s:gsub(a:query,'.','[&].*')
+  let filtered = filter(copy(results),'v:val =~# regex')
   return filtered
 endfunction
 
@@ -461,7 +470,7 @@ function! s:projection_complete(lead, cmdline, _) abort
     let glob = substitute(format, '[^\/]*\ze\*\*[\/]\*', '', 'g')
     let results += map(split(glob(glob), "\n"), 's:match(v:val, format)')
   endfor
-  return s:completion_filter(results, a:lead)
+  return projectionist#completion_filter(results, a:lead, '/')
 endfunction
 
 " Section: :A

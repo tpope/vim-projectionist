@@ -369,9 +369,12 @@ function! projectionist#completion_filter(results, query, sep, ...) abort
 
   let C = get(g:, 'projectionist_completion_filter')
   if type(C) == type({}) && has_key(C, 'Apply')
-    return call(C.Apply, [a:results, a:query, a:sep, a:0 ? a:1 : {}], C)
+    let results = call(C.Apply, [a:results, a:query, a:sep, a:0 ? a:1 : {}], C)
   elseif type(C) == type('') && exists('*'.C)
-    return call(C, [a:results, a:query, a:sep, a:0 ? a:1 : {}])
+    let results = call(C, [a:results, a:query, a:sep, a:0 ? a:1 : {}])
+  endif
+  if get(l:, 'results') isnot# 0
+    return results
   endif
 
   let results = s:uniq(sort(copy(a:results)))

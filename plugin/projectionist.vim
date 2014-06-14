@@ -1,6 +1,11 @@
 " Location:     plugin/projectionist.vim
 " Author:       Tim Pope <http://tpo.pe/>
 
+if exists('g:loaded_rails')
+  echoerr "projectionist.vim was loaded after rails.vim - expect errors!"
+  finish
+endif
+
 if exists("g:loaded_projectionist") || v:version < 700 || &cp
   finish
 endif

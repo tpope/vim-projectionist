@@ -27,7 +27,7 @@ As you can see, rbenv plugins have hooks in `etc/rbenv.d/` and commands in
 `bin/` matching `rbenv-*`.  Here's a projectionist configuration for that
 setup:
 
-    let g:projectiles = {
+    let g:projectionist_heuristics = {
           \   "etc/rbenv.d/|bin/rbenv-*": {
           \     "bin/rbenv-*": {
           \        "type": "command",
@@ -54,9 +54,9 @@ highlights.
 
 ### Global and per project projection definitions
 
-In the above example, we used the global `g:projectiles` to declare
-projections based on requirements in the root directory.  If that's not
-flexible enough, you can use the autocommand based API, or create a
+In the above example, we used the global `g:projectionist_heuristics` to
+declare projections based on requirements in the root directory.  If that's
+not flexible enough, you can use the autocommand based API, or create a
 `.projections.json` in the root of the project.
 
 ### Navigation commands

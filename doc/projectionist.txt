@@ -86,20 +86,21 @@ The full list of available properties in a projection is as follows:
         is used as the default destination of the navigation command when no
         argument is given.
 
-                                                *g:projectiles*
+                                                *g:projectionist_heuristics*
 In addition to ".projections.json", projections can be defined globally
 through use of the |projectionist-autocmds| API or through the variable
-g:projectiles, a |Dictionary| mapping between a string describing the root of
-the project and a set of projections.  The keys of the dictionary are files
-and directories that can be found in the root of a project, with & separating
-multiple requirements and | separating multiple alternatives.  You can also
-prefix a file or directory with ! to forbid rather than require its presence.
+g:projectionist_heuristics, a |Dictionary| mapping between a string describing
+the root of the project and a set of projections.  The keys of the dictionary
+are files and directories that can be found in the root of a project, with &
+separating multiple requirements and | separating multiple alternatives.  You
+can also prefix a file or directory with ! to forbid rather than require its
+presence.
 
 In the example below, the first key requires a directory named
 lib/heroku/ and a file named init.rb, and the second requires a directory
 named etc/rbenv.d/ or one or more files matching the glob bin/rbenv-*.
 >
-    let g:projectiles = {
+    let g:projectionist_heuristics = {
           \ "lib/heroku/&init.rb": {
           \   "lib/heroku/command/*.rb": {"type": "command"}
           \ },

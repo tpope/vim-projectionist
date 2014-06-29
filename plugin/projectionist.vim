@@ -53,13 +53,10 @@ function! ProjectionistDetect(path) abort
   let modelines = &modelines
   try
     set modelines=0
-    let g:projectile_file = file
     let g:projectionist_file = file
-    silent doautocmd User ProjectileDetect
     silent doautocmd User ProjectionistDetect
   finally
     let &modelines = modelines
-    unlet! g:projectile_file
     unlet! g:projectionist_file
   endtry
 

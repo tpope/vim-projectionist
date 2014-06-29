@@ -359,7 +359,6 @@ function! projectionist#activate() abort
     break
   endfor
 
-  silent doautocmd User ProjectileActivate
   silent doautocmd User ProjectionistActivate
 endfunction
 

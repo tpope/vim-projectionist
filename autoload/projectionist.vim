@@ -136,13 +136,9 @@ function! g:projectionist_transformations.dirname(input, o) abort
   return substitute(a:input, '.[^'.projectionist#slash().'/]*$', '', '')
 endfunction
 
-let g:projectionist_transformations.head = g:projectionist_transformations.dirname
-
 function! g:projectionist_transformations.basename(input, o) abort
   return substitute(a:input, '.*['.projectionist#slash().'/]', '', '')
 endfunction
-
-let g:projectionist_transformations.tail = g:projectionist_transformations.basename
 
 function! g:projectionist_transformations.open(input, o) abort
   return '{'

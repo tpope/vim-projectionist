@@ -459,7 +459,7 @@ function! s:open_projection(cmd, variants, ...) abort
   if !isdirectory(fnamemodify(target, ':h'))
     call mkdir(fnamemodify(target, ':h'), 'p')
   endif
-  return a:cmd . ' ' . fnameescape(target)
+  return a:cmd . ' ' . fnameescape(fnamemodify(target, ':~:.'))
 endfunction
 
 function! s:projection_complete(lead, cmdline, _) abort
@@ -497,7 +497,7 @@ function! s:edit_command(cmd, count, ...) abort
   if !isdirectory(fnamemodify(file, ':h'))
     call mkdir(fnamemodify(file, ':h'), 'p')
   endif
-  return a:cmd . ' ' . fnameescape(file)
+  return a:cmd . ' ' . fnameescape(fnamemodify(file, ':~:.'))
 endfunction
 
 function! s:edit_complete(lead, cmdline, _) abort

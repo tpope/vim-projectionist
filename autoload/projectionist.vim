@@ -320,11 +320,7 @@ function! projectionist#activate() abort
   command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete A AE<bang> <args>
   command! -buffer -bang -nargs=1 -range=0 -complete=command ProjectDo execute s:do('<bang>', <count>==<line1>?<count>:-1, <q-args>)
 
-  for [root, makeopt] in projectionist#query('make')
-    let makeprg = s:shellcmd(makeopt)
-    if empty(makeprg)
-      continue
-    endif
+  for [root, makeprg] in projectionist#query_exec('make')
     unlet! b:current_compiler
     setlocal errorformat<
     let compiler = fnamemodify(matchstr(makeprg, '\S\+'), ':t:r')
@@ -335,9 +331,7 @@ function! projectionist#activate() abort
       execute 'compiler' compiler
     endif
     let &l:makeprg = makeprg
-    if !(type(makeopt) ==# type([]) && !empty(filter(copy(makeopt), 'stridx(v:val, root) >= 0')))
-      let &l:errorformat .= ',chdir '.escape(root, ',')
-    endif
+    let &l:errorformat .= ',chdir '.escape(root, ',')
     break
   endfor
 

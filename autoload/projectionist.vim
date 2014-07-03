@@ -322,13 +322,15 @@ function! projectionist#activate() abort
 
   for [root, makeprg] in projectionist#query_exec('make')
     unlet! b:current_compiler
-    setlocal errorformat<
     let compiler = fnamemodify(matchstr(makeprg, '\S\+'), ':t:r')
+    setlocal errorformat=%+I%.%#,
     if exists(':Dispatch')
       silent! let compiler = dispatch#compiler_for_program(makeprg)
     endif
     if !empty(findfile('compiler/'.compiler.'.vim', escape(&rtp, ' ')))
       execute 'compiler' compiler
+    elseif compiler ==# 'make'
+      setlocal errorformat<
     endif
     let &l:makeprg = makeprg
     let &l:errorformat .= ',chdir '.escape(root, ',')

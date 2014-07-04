@@ -72,7 +72,7 @@ augroup projectionist
         \ if (&filetype ==# 'netrw' && !exists('b:projectionist')) ||
         \     &buftype !~# 'nofile\|quickfix' |
         \   call ProjectionistDetect(expand('%:p')) |
-        \  endif
+        \ endif
   autocmd BufFilePost * call ProjectionistDetect(expand('<afile>:p'))
   autocmd BufNewFile,BufReadPost *
         \ if empty(&filetype) |

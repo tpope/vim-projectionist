@@ -41,6 +41,8 @@ camelcase       foo/bar_baz to Foo/BarBaz
 capitalize      capitalize first letter and each letter after a slash
 dirname         remove last slash separated component
 basename        remove all but last slash separated component
+singular        singularize
+plural          pluralize
 file            absolute path to file
 project         absolute path to project
 open            literal {

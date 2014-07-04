@@ -140,6 +140,26 @@ function! g:projectionist_transformations.basename(input, o) abort
   return substitute(a:input, '.*['.projectionist#slash().'/]', '', '')
 endfunction
 
+function! g:projectionist_transformations.singular(input, o) abort
+  let input = a:input
+  let input = s:sub(input, '%([Mm]ov|[aeio])@<!ies$', 'ys')
+  let input = s:sub(input, '[rl]@<=ves$', 'fs')
+  let input = s:sub(input, '%(nd|rt)@<=ices$', 'exs')
+  let input = s:sub(input, 's@<!s$', '')
+  let input = s:sub(input, '%([nrt]ch|tatus|lias|ss)@<=e$', '')
+  return input
+endfunction
+
+function! g:projectionist_transformations.plural(input, o) abort
+  let input = a:input
+  let input = s:sub(input, '[aeio]@<!y$', 'ie')
+  let input = s:sub(input, '[rl]@<=f$', 've')
+  let input = s:sub(input, '%(nd|rt)@<=ex$', 'ice')
+  let input = s:sub(input, '%([osxz]|[cs]h)$', '&e')
+  let input .= 's'
+  return input
+endfunction
+
 function! g:projectionist_transformations.open(input, o) abort
   return '{'
 endfunction

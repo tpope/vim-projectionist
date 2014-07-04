@@ -102,16 +102,15 @@ project.
 
 ### Buffer configuration
 
-Check out these examples for a Ruby project:
+Check out these examples for a minimal Ruby project:
 
     {
       "*": {"make": ["rake", "-f", "{project}/Rakefile"]},
-      "*.rb": {"indent": 2},
       "spec/*_spec.rb": {"dispatch": ["rspec", "{file}"]}
     }
 
-That last one sets the default for [dispatch.vim][].  The possibilities are
-*endless*.
+That second one sets the default for [dispatch.vim][].  Plugins can use
+projections for their own configuration.
 
 [dispatch.vim]: https://github.com/tpope/vim-dispatch
 

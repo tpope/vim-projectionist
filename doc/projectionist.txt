@@ -29,22 +29,22 @@ by the "*".  You can also chain one or more transformations inside the braces
 separated by bars, e.g. "{dot|hyphenate}".  The complete list of available
 transformations is as follows:
 
-Name           Behavior ~
-dot            / to .
-underscore     / to _
-backslash      / to \
-colons         / to ::
-hyphenate      _ to -
-blank          _ and - to space
-uppercase      uppercase
-camelcase      foo/bar_baz to Foo/BarBaz
-capitalize     capitalize first letter and each letter after a slash
-dirname        remove last slash separated component
-basename       remove all but last slash separated component
-file           absolute path to file
-project        absolute path to project
-open           literal {
-close          literal }
+Name            Behavior ~
+dot             / to .
+underscore      / to _
+backslash       / to \
+colons          / to ::
+hyphenate       _ to -
+blank           _ and - to space
+uppercase       uppercase
+camelcase       foo/bar_baz to Foo/BarBaz
+capitalize      capitalize first letter and each letter after a slash
+dirname         remove last slash separated component
+basename        remove all but last slash separated component
+file            absolute path to file
+project         absolute path to project
+open            literal {
+close           literal }
 
 From a globbing perspective, "*" is actually a stand in for "**/*".  For
 advanced cases, you can include both globs explicitly: "test/**/test_*.rb".

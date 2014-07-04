@@ -50,7 +50,7 @@ function! projectionist#slash() abort
   return exists('+shellslash') && !&shellslash ? '\' : '/'
 endfunction
 
-function! s:slash(str)
+function! s:slash(str) abort
   return tr(a:str, projectionist#slash(), '/')
 endfunction
 
@@ -285,7 +285,7 @@ function! projectionist#append(root, ...) abort
   call add(b:projectionist[a:root], get(a:000, -1, {}))
 endfunction
 
-function! projectionist#define_navigation_command(command, patterns)
+function! projectionist#define_navigation_command(command, patterns) abort
   for [prefix, excmd] in items(s:prefixes)
     execute 'command! -buffer -bar -bang -nargs=* -complete=customlist,s:projection_complete'
           \ prefix . substitute(a:command, '\A', '', 'g')

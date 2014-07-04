@@ -67,6 +67,18 @@ function! projectionist#json_parse(string) abort
   throw "invalid JSON: ".string
 endfunction
 
+function! projectionist#shellescape(a:arg) abort
+  return a:arg =~# "^[[:alnum:]_/.:-]\\+$" ? a:arg : shellescape(a:arg)
+endfunction
+
+function! s:shellcmd(arg) abort
+  if type(a:arg) == type([])
+    return join(map(copy(a:arg), 'projectionist#shellescape(v:val)'), ' ')
+  elseif type(a:arg) == type('')
+    return a:arg
+  endif
+endfunction
+
 " Section: Querying
 
 function! s:paths() abort
@@ -306,14 +318,6 @@ function! projectionist#define_navigation_command(command, patterns) abort
           \ prefix . substitute(a:command, '\A', '', 'g')
           \ ':execute s:open_projection("'.excmd.'<bang>",'.string(a:patterns).',<f-args>)'
   endfor
-endfunction
-
-function! s:shellcmd(arg) abort
-  if type(a:arg) == type([])
-    return join(map(copy(a:arg), 'v:val =~# "^[[:alnum:]_/.:=-]\\+$" ? v:val : shellescape(v:val)'), ' ')
-  elseif type(a:arg) == type('')
-    return a:arg
-  endif
 endfunction
 
 function! projectionist#activate() abort

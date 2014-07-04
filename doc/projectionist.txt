@@ -20,8 +20,8 @@ Maven project:
         "alternate": "src/main/java/{}.java",
         "type": "test"
       },
-      "*.java": {"dispatch": ["javac", "{file}"]},
-      "*": {"make": ["mvn", "-f", "{project}/pom.xml"]}
+      "*.java": {"dispatch": "javac {file}"},
+      "*": {"make": "mvn"}
     }
 <
 In property values, "{}" will be replaced by the portion of the glob matched
@@ -63,21 +63,19 @@ The full list of available properties in a projection is as follows:
 						*projectionist-dispatch*
 "dispatch" ~
         Default task to use for |:Dispatch| in dispatch.vim.  If not provided,
-        the option for any existing alternate file is used instead.  Set to a
-        list of arguments and they will be shell escaped and joined.
+        the option for any existing alternate file is used instead.
+        Expansions are shell escaped.
 						*projectionist-make*
 "make" ~
         Sets 'makeprg'.  Also loads a |:compiler| plugin if one is available
         matching the executable name.  This is useful to set from a "*"
-        projection.  Set to a list of arguments and they will be shell escaped
-        and joined.
+        projection.  Expansions are shell escaped.
 						*projectionist-start*
 "start" ~
         Command to run to "boot" the project.  Examples include `lein run`,
         `rails server`, and `foreman start`.  It will be used as a default
         task for |:Start| in dispatch.vim.  This is useful to set from a "*"
-        projection.  Set to a list of arguments and they will be shell escaped
-        and joined.
+        projection.  Expansions are shell escaped.
 						*projectionist-template*
 "template" ~
         Array of lines to use when creating a new file.

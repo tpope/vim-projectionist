@@ -105,8 +105,8 @@ project.
 Check out these examples for a minimal Ruby project:
 
     {
-      "*": {"make": ["rake", "-f", "{project}/Rakefile"]},
-      "spec/*_spec.rb": {"dispatch": ["rspec", "{file}"]}
+      "*": {"make": "rake"},
+      "spec/*_spec.rb": {"dispatch": "rspec {file}"}
     }
 
 That second one sets the default for [dispatch.vim][].  Plugins can use

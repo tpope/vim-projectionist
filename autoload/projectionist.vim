@@ -67,15 +67,17 @@ function! projectionist#json_parse(string) abort
   throw "invalid JSON: ".string
 endfunction
 
-function! projectionist#shellescape(a:arg) abort
+function! projectionist#shellescape(arg) abort
   return a:arg =~# "^[[:alnum:]_/.:-]\\+$" ? a:arg : shellescape(a:arg)
 endfunction
 
-function! s:shellcmd(arg) abort
+function! s:join(arg) abort
   if type(a:arg) == type([])
-    return join(map(copy(a:arg), 'projectionist#shellescape(v:val)'), ' ')
+    return join(a:arg, ' ')
   elseif type(a:arg) == type('')
     return a:arg
+  else
+    return ''
   endif
 endfunction
 
@@ -195,6 +197,9 @@ function! s:expand_placeholder(placeholder, expansions) abort
     endif
     let value = g:projectionist_transformations[transform](value, a:expansions)
   endfor
+  if has_key(a:expansions, 'post_function')
+    let value = call(a:expansions.post_function, [value])
+  endif
   return value
 endfunction
 
@@ -274,7 +279,8 @@ function! projectionist#query_file(key) abort
 endfunction
 
 function! projectionist#query_exec(key, ...) abort
-  return filter(map(projectionist#query(a:key, a:0 ? a:1 : {}), '[v:val[0], s:shellcmd(v:val[1])]'), '!empty(v:val[1])')
+  let opts = extend({'post_function': 'projectionist#shellescape'}, a:0 ? a:1 : {})
+  return filter(map(projectionist#query(a:key, opts), '[v:val[0], s:join(v:val[1])]'), '!empty(v:val[1])')
 endfunction
 
 function! projectionist#query_scalar(key) abort

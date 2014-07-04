@@ -170,12 +170,7 @@ function! s:expand_placeholders(value, expansions) abort
   if type(a:value) ==# type([]) || type(a:value) ==# type({})
     return map(copy(a:value), 's:expand_placeholders(v:val, a:expansions)')
   endif
-  let legacy = {
-        \ '%s': 'replace %s with {}',
-        \ '%d': 'replace %d with {dot}',
-        \ '%u': 'replace %u with {underscore}'}
   let value = substitute(a:value, '{[^{}]*}', '\=s:expand_placeholder(submatch(0), a:expansions)', 'g')
-  let value = substitute(value, '%[sdu]', '\=get(legacy, submatch(0), "\001")', 'g')
   return value =~# "\001" ? '' : value
 endfunction
 

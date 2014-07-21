@@ -1,5 +1,7 @@
 " Location:     plugin/projectionist.vim
 " Author:       Tim Pope <http://tpo.pe/>
+" Version:      1.0
+" GetLatestVimScripts: 4989 1 :AutoInstall: projectionist.vim
 
 if exists("g:loaded_projectionist") || v:version < 700 || &cp
   finish

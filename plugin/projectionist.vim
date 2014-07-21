@@ -7,9 +7,8 @@ endif
 let g:loaded_projectionist = 1
 
 if !exists('g:projectionist_heuristics')
-  let g:projectionist_heuristics = get(g:, 'projectiles', {})
+  let g:projectionist_heuristics = {}
 endif
-let g:projectiles = g:projectionist_heuristics
 
 function! s:has(root, file) abort
   let file = matchstr(a:file, '[^!].*')

@@ -1,7 +1,7 @@
 # projectionist.vim
 
-Projectionist is a general purpose plugin based on "projections" from
-[rails.vim][].  What are projections?  Let's start with an example.
+Projectionist provides granular project configuration using "projections".
+What are projections?  Let's start with an example.
 
 ## Example
 

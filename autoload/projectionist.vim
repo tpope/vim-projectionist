@@ -315,7 +315,10 @@ function! projectionist#append(root, ...) abort
   if !has_key(b:projectionist, a:root)
     let b:projectionist[a:root] = []
   endif
-  call add(b:projectionist[a:root], get(a:000, -1, {}))
+  let projections = get(a:000, -1, {})
+  if type(projections) == type({})
+    call add(b:projectionist[a:root], projections)
+  endif
 endfunction
 
 function! projectionist#define_navigation_command(command, patterns) abort

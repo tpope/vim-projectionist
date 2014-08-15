@@ -143,9 +143,7 @@ function! g:projectionist_transformations.camelcase(input, o) abort
 endfunction
 
 function! g:projectionist_transformations.snakecase(input, o) abort
-  return tolower(
-    substitute(a:input, '\(\<\u\l\+\|\l\+\)\(\u\)', '\l\1_\l\2', 'g')
-  )
+  return tolower(substitute(a:input, '\(\<\u\l\+\|\l\+\)\(\u\)', '\l\1_\l\2', 'g'))
 endfunction
 
 function! g:projectionist_transformations.capitalize(input, o) abort

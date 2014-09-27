@@ -452,6 +452,22 @@ function! projectionist#navigation_commands() abort
   return commands
 endfunction
 
+function! projectionist#list_all() abort
+    let categories = {}
+    for [category, globbed_files] in items(projectionist#navigation_commands())
+        let results = []
+        for format in map(globbed_files, 'v:val[1]')
+            if format !~# '\*'
+                continue
+            endif
+            let glob = substitute(format, '[^\/]*\ze\*\*[\/]\*', '', 'g')
+            let results += map(split(glob(glob), "\n"), '[s:match(v:val, format), v:val]')
+        endfor
+        let categories[category] = results
+    endfor
+    return categories
+endfunction
+
 function! s:open_projection(cmd, variants, ...) abort
   let formats = []
   for variant in a:variants

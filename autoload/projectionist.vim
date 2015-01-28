@@ -407,6 +407,7 @@ function! projectionist#completion_filter(results, query, sep, ...) abort
   if get(l:, 'results') isnot# 0
     return results
   endif
+  unlet! results
 
   let results = s:uniq(sort(copy(a:results)))
   call filter(results,'v:val !~# "\\~$"')

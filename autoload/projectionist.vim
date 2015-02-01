@@ -398,7 +398,7 @@ function! projectionist#completion_filter(results, query, sep, ...) abort
     return filter(results,'v:val =~# "^".regex')
   endif
 
-  let C = get(g:, 'projectionist_completion_filter')
+  let C = get(g:, 'projectionist_completion_filter', get(g:, 'completion_filter'))
   if type(C) == type({}) && has_key(C, 'Apply')
     let results = call(C.Apply, [a:results, a:query, a:sep, a:0 ? a:1 : {}], C)
   elseif type(C) == type('') && exists('*'.C)

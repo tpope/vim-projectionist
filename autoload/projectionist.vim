@@ -387,7 +387,9 @@ function! projectionist#activate() abort
     break
   endfor
 
-  silent doautocmd User ProjectionistActivate
+  if exists('#User#ProjectionistActivate')
+    doautocmd User ProjectionistActivate
+  endif
 endfunction
 
 " Section: Completion

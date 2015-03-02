@@ -131,6 +131,10 @@ I don't see any reason to tie the concept of projections to Vim in particular.
 While some features (in particular navigation commands) are idiosyncratic to
 the way Vim works, others could make sense in a wide variety of editors.
 
+There's currently one other tool that makes use of the `.projections.json`
+format; [projectionist](https://github.com/glittershark/projectionist), which
+provides a CLI to edit files in a manner similar to this plugin.
+
 ## License
 
 Copyright © Tim Pope.  Distributed under the same terms as Vim itself.

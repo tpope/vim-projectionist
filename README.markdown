@@ -127,9 +127,9 @@ then simply copy and paste:
 
 > Why not a clearer filename like `.vim_projections.json`?
 
-I don't see any reason to tie the concept of projections to Vim in particular.
-While some features (in particular navigation commands) are idiosyncratic to
-the way Vim works, others could make sense in a wide variety of editors.
+Nothing about the file is Vim specific.  See
+[projectionist](https://github.com/glittershark/projectionist) for an example
+of another tool that uses it.
 
 ## License
 

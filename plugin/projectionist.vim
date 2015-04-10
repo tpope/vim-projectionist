@@ -88,7 +88,7 @@ augroup projectionist
         \ endif
   autocmd BufWritePost .projections.json call ProjectionistDetect(expand('<afile>:p'))
   autocmd BufNewFile *
-        \ if !empty(b:projectionist) |
+        \ if has_key(b:, 'projectionist') && !empty(b:projectionist) |
         \   call projectionist#apply_template() |
         \ endif
 augroup END

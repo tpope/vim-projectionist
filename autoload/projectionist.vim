@@ -525,8 +525,22 @@ function! s:edit_command(cmd, count, ...) abort
       return 'echoerr '.string(matchstr(warning, 'replace %.*}').' in alternate projection')
     endif
     let file = get(filter(copy(alternates), '!empty(getftype(v:val))'), 0, '')
-    if empty(file)
+    if empty(alternates)
       return 'echoerr "No alternate file"'
+    elseif empty(file)
+      let choices = ['Create alternate file?']
+      let i = 0
+      for alt in alternates
+        let i += 1
+        call add(choices, i.' '.alt)
+      endfor
+      let i = inputlist(choices)
+      if i > 0
+        let file = get(alternates, i-1, '')
+      endif
+      if empty(file)
+        return ''
+      endif
     endif
   endif
   if !isdirectory(fnamemodify(file, ':h'))

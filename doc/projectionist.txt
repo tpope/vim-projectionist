@@ -61,6 +61,11 @@ The full list of available properties in a projection is as follows:
 "alternate" ~
         Determines the destination of the |projectionist-:A| command.  If this
         is a list, the first readable file will be used.
+						*projectionist-console*
+"console" ~
+        Command to run to start a REPL or other interactive shell.  Will be
+        defined as :Console.  This is useful to set from a "*" projection or
+        on a simple file glob like "*.js".  Experimental.
 						*projectionist-dispatch*
 "dispatch" ~
         Default task to use for |:Dispatch| in dispatch.vim.  If not provided,

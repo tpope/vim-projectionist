@@ -380,6 +380,16 @@ function! projectionist#activate() abort
     break
   endfor
 
+  for [root, command] in projectionist#query_exec('console')
+    let offset = index(s:paths(), root) + 1
+    execute 'command! -bar -bang -buffer -nargs=* Console ' .
+          \ 'ProjectDo ' . (offset == 1 ? '' : offset.' ') .
+          \ (exists(':Start') < 2 ? '!' : 'Start<bang> -title=' .
+          \ escape(fnamemodify(root, ':t'), '\ ') . '\ console ') .
+          \ command . ' <args>'
+    break
+  endfor
+
   for [root, command] in s:query_exec_with_alternate('dispatch')
     let offset = index(s:paths(), root) + 1
     let b:dispatch = ':ProjectDo ' . (offset == 1 ? '' : offset.' ') .

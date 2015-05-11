@@ -286,9 +286,13 @@ function! projectionist#query_file(key) abort
   return files
 endfunction
 
+function! s:shelljoin(val) abort
+  return substitute(s:join(a:val), '["'']\([{}]\)["'']', '\1', 'g')
+endfunction
+
 function! projectionist#query_exec(key, ...) abort
   let opts = extend({'post_function': 'projectionist#shellescape'}, a:0 ? a:1 : {})
-  return filter(map(projectionist#query(a:key, opts), '[v:val[0], s:join(v:val[1])]'), '!empty(v:val[1])')
+  return filter(map(projectionist#query(a:key, opts), '[v:val[0], s:shelljoin(v:val[1])]'), '!empty(v:val[1])')
 endfunction
 
 function! projectionist#query_scalar(key) abort

@@ -402,8 +402,9 @@ function! projectionist#activate() abort
   endfor
 
   for root in s:paths()
-    if stridx(','.&l:tags.',', ','.escape(root, ', ').',') < 0
-      let &l:tags = &tags . ',' . escape(root, ', ')
+    let tags = root . projectionist#slash() . 'tags'
+    if stridx(','.&l:tags.',', ','.escape(tags, ', ').',') < 0
+      let &l:tags = &tags . ',' . escape(tags, ', ')
     endif
   endfor
 

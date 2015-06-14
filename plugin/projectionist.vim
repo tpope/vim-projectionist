@@ -79,7 +79,12 @@ augroup projectionist
         \ if empty(&filetype) |
         \   call ProjectionistDetect(expand('<afile>:p')) |
         \ endif
-  autocmd CmdWinEnter * call ProjectionistDetect(expand('#:p'))
+  autocmd CmdWinEnter *
+        \ if !empty(getbufvar('#', 'projectionist_file')) |
+        \   let b:projectionist_file = getbufvar('#', 'projectionist_file') |
+        \   let b:projectionist = getbufvar('#', 'projectionist') |
+        \   call projectionist#activate() |
+        \ endif
   autocmd User NERDTreeInit,NERDTreeNewRoot
         \ call ProjectionistDetect(b:NERDTreeRoot.path.str())
   autocmd VimEnter *

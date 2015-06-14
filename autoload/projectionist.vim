@@ -25,9 +25,6 @@ function! s:endswith(str, suffix) abort
 endfunction
 
 function! s:uniq(list) abort
-  if exists('*uniq')
-    return uniq(a:list)
-  endif
   let i = 0
   let seen = {}
   while i < len(a:list)
@@ -528,6 +525,7 @@ function! s:projection_complete(lead, cmdline, _) abort
     let glob = substitute(format, '[^\/]*\ze\*\*[\/]\*', '', 'g')
     let results += map(split(glob(glob), "\n"), 's:match(v:val, format)')
   endfor
+  call s:uniq(results)
   return projectionist#completion_filter(results, a:lead, '/')
 endfunction
 

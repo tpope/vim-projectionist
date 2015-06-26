@@ -274,11 +274,19 @@ function! projectionist#query(key, ...) abort
   return candidates
 endfunction
 
+function! s:absolute(path, in) abort
+  if a:path =~# '^\%([[:alnum:].-]\+:\)\|^[\/]'
+    return a:path
+  else
+    return simplify(a:in . projectionist#slash() . a:path)
+  endif
+endfunction
+
 function! projectionist#query_file(key) abort
   let files = []
   let _ = {}
   for [root, _.match] in projectionist#query(a:key)
-    call extend(files, map(type(_.match) == type([]) ? copy(_.match) : [_.match], 'simplify(root . projectionist#slash() . v:val)'))
+    call extend(files, map(type(_.match) == type([]) ? copy(_.match) : [_.match], 's:absolute(v:val, root)'))
   endfor
   return files
 endfunction
@@ -396,6 +404,12 @@ function! projectionist#activate() abort
     let b:dispatch = ':ProjectDo ' . (offset == 1 ? '' : offset.' ') .
           \ substitute('Dispatch '.command, 'Dispatch :', '', '')
     break
+  endfor
+
+  for dir in projectionist#query_file('path')
+    if stridx(','.&l:path.',', ','.escape(dir, ', ').',') < 0
+      let &l:path = &path . ',' . escape(dir, ', ')
+    endif
   endfor
 
   for root in s:paths()

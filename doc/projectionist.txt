@@ -76,6 +76,11 @@ The full list of available properties in a projection is as follows:
         Sets 'makeprg'.  Also loads a |:compiler| plugin if one is available
         matching the executable name.  This is useful to set from a "*"
         projection.  Expansions are shell escaped.
+						*projectionist-path*
+"path" ~
+        Additional directories to add to 'path'.  Can be relative to the
+        project root or absolute.  This is useful to set on a simple file glob
+        like "*.js".
 						*projectionist-start*
 "start" ~
         Command to run to "boot" the project.  Examples include `lein run`,

@@ -334,7 +334,7 @@ function! projectionist#append(root, ...) abort
   endif
   let projections = get(a:000, -1, {})
   if type(projections) == type({})
-    call add(b:projectionist[a:root], projections)
+    call add(b:projectionist[a:root], filter(projections, 'type(v:val) == type({})'))
   endif
 endfunction
 

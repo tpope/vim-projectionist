@@ -546,11 +546,13 @@ endfunction
 " Section: :A
 
 function! s:jumpopt(file) abort
-  let pattern = '[:+@#]\d\+$\|[+@#].*$'
+  let pattern = '!$\|[:+@#]\d\+$\|[+@#].*$'
   let file = substitute(a:file, pattern, '', '')
   let jump = matchstr(a:file, pattern)
   if jump =~# '^[:+@#]\d\+$'
     return [file, '+'.jump[1:-1].' ']
+  elseif jump ==# '!'
+    return [file, '+AD ']
   elseif !empty(jump)
     return [file, '+A'.escape(jump, ' ').' ']
   else
@@ -567,6 +569,9 @@ function! s:edit_command(cmd, count, ...) abort
     if empty(open[0])
       return 'echoerr "Invalid count"'
     endif
+  elseif a:cmd =~# 'read'
+    call projectionist#apply_template()
+    return ''
   else
     let alternates = projectionist#query_file('alternate')
     let warning = get(filter(copy(alternates), 'v:val =~# "replace %.*}"'), 0, '')
@@ -659,7 +664,6 @@ function! projectionist#apply_template() abort
     endif
     %delete_
     call setline(1, split(template, "\n"))
-    setlocal nomodified
     doautocmd BufReadPost
   endif
   return ''

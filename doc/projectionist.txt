@@ -141,7 +141,10 @@ are available.
 :AT [file]              Like :A, but open in a tab.
 
                                                 *projectionist-:AD*
-:AD [file]              Like :A, but |:read| the file into the current buffer.
+:AD                     Replace the contents of the buffer with the new file
+                        template.
+
+:AD {file}              Like :A, but |:read| the file into the current buffer.
 
                                                 *projectionist-:Cd*
 :Cd                     |:cd| to the innermost root.

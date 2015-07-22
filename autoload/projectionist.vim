@@ -429,7 +429,7 @@ endfunction
 function! projectionist#completion_filter(results, query, sep, ...) abort
   if a:query =~# '\*'
     let regex = s:gsub(a:query, '\*', '.*')
-    return filter(results,'v:val =~# "^".regex')
+    return filter(copy(a:results),'v:val =~# "^".regex')
   endif
 
   let C = get(g:, 'projectionist_completion_filter', get(g:, 'completion_filter'))

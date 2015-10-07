@@ -589,7 +589,11 @@ function! s:edit_command(cmd, count, ...) abort
         let i += 1
         call add(choices, i.' '.alt)
       endfor
-      let i = inputlist(choices)
+      if len(alternates) == 1 && g:projectionist_autocreate_alternative_file == 1
+        let i = 1
+      else
+        let i = inputlist(choices)
+      endif
       if i > 0
         let open = get(alternates, i-1, [])
       endif

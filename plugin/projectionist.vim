@@ -12,6 +12,10 @@ if !exists('g:projectionist_heuristics')
   let g:projectionist_heuristics = {}
 endif
 
+if !exists('g:projectionist_autocreate_alternative_file')
+  let g:projectionist_autocreate_alternative_file = 0
+endif
+
 function! s:has(root, file) abort
   let file = matchstr(a:file, '[^!].*')
   if file =~# '\*'

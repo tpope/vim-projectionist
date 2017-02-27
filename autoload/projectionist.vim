@@ -275,7 +275,7 @@ function! projectionist#query(key, ...) abort
 endfunction
 
 function! s:absolute(path, in) abort
-  if a:path =~# '^\%([[:alnum:].-]\+:\)\|^[\/]'
+  if a:path =~# '^\%([[:alnum:].-]\+:\)\|^\.\?[\/]'
     return a:path
   else
     return simplify(a:in . projectionist#slash() . a:path)

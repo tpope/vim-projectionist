@@ -139,6 +139,10 @@ function! g:projectionist_transformations.camelcase(input, o) abort
   return substitute(a:input, '[_-]\(.\)', '\u\1', 'g')
 endfunction
 
+function! g:projectionist_transformations.snakecase(input, o) abort
+  return tolower(substitute(a:input, '\(\<\u\l\+\|\l\+\)\(\u\)', '\l\1_\l\2', 'g'))
+endfunction
+
 function! g:projectionist_transformations.capitalize(input, o) abort
   return substitute(a:input, '\%(^\|/\)\zs\(.\)', '\u\1', 'g')
 endfunction

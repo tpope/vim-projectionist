@@ -288,7 +288,7 @@ function! projectionist#query_file(key) abort
   for [root, _.match] in projectionist#query(a:key)
     call extend(files, map(type(_.match) == type([]) ? copy(_.match) : [_.match], 's:absolute(v:val, root)'))
   endfor
-  return files
+  return s:uniq(files)
 endfunction
 
 function! s:shelljoin(val) abort

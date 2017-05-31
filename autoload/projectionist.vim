@@ -603,7 +603,7 @@ function! s:edit_command(cmd, count, ...) abort
     call mkdir(fnamemodify(file, ':h'), 'p')
   endif
   return s:sub(a:cmd, '^%(\<mods\>)? ?', '') . ' ' .
-        \ . jump . fnameescape(fnamemodify(file, ':~:.'))
+        \ jump . fnameescape(fnamemodify(file, ':~:.'))
 endfunction
 
 function! s:edit_complete(lead, cmdline, _) abort

@@ -342,7 +342,7 @@ function! projectionist#define_navigation_command(command, patterns) abort
   for [prefix, excmd] in items(s:prefixes)
     execute 'command! -buffer -bar -bang -nargs=* -complete=customlist,s:projection_complete'
           \ prefix . substitute(a:command, '\A', '', 'g')
-          \ ':execute s:open_projection("'.excmd.'<bang>",'.string(a:patterns).',<f-args>)'
+          \ ':execute s:open_projection("<mods> '.excmd.'<bang>",'.string(a:patterns).',<f-args>)'
   endfor
 endfunction
 
@@ -357,12 +357,11 @@ function! projectionist#activate() abort
   for [command, patterns] in items(projectionist#navigation_commands())
     call projectionist#define_navigation_command(command, patterns)
   endfor
-  for [prefix, excmd] in items(s:prefixes)
+  for [prefix, excmd] in items(s:prefixes) + [['', 'edit']]
     execute 'command! -buffer -bar -bang -nargs=* -range=1 -complete=customlist,s:edit_complete'
           \ 'A'.prefix
-          \ ':execute s:edit_command("'.excmd.'<bang>", <line2>, <f-args>)'
+          \ ':execute s:edit_command("<mods> '.excmd.'<bang>", <line2>, <f-args>)'
   endfor
-  command! -buffer -bar -bang -nargs=* -complete=customlist,s:edit_complete A AE<bang> <args>
   command! -buffer -bang -nargs=1 -range=0 -complete=command ProjectDo execute s:do('<bang>', <count>==<line1>?<count>:-1, <q-args>)
 
   for [root, makeprg] in projectionist#query_exec('make')
@@ -526,7 +525,8 @@ function! s:open_projection(cmd, variants, ...) abort
   if !isdirectory(fnamemodify(target, ':h'))
     call mkdir(fnamemodify(target, ':h'), 'p')
   endif
-  return a:cmd . ' ' . fnameescape(fnamemodify(target, ':~:.'))
+  return s:sub(a:cmd, '^%(\<mods\>)? ?', '') . ' ' .
+        \ fnameescape(fnamemodify(target, ':~:.'))
 endfunction
 
 function! s:projection_complete(lead, cmdline, _) abort
@@ -602,7 +602,8 @@ function! s:edit_command(cmd, count, ...) abort
   if !isdirectory(fnamemodify(file, ':h'))
     call mkdir(fnamemodify(file, ':h'), 'p')
   endif
-  return a:cmd . ' ' . jump . fnameescape(fnamemodify(file, ':~:.'))
+  return s:sub(a:cmd, '^%(\<mods\>)? ?', '') . ' ' .
+        \ . jump . fnameescape(fnamemodify(file, ':~:.'))
 endfunction
 
 function! s:edit_complete(lead, cmdline, _) abort

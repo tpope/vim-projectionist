@@ -143,6 +143,10 @@ function! g:projectionist_transformations.capitalize(input, o) abort
   return substitute(a:input, '\%(^\|/\)\zs\(.\)', '\u\1', 'g')
 endfunction
 
+function! g:projectionist_transformations.decapitalize(input, o) abort
+  return substitute(a:input, '\%(^\|/\)\zs\(.\)', '\l\1', 'g')
+endfunction
+
 function! g:projectionist_transformations.snakecase(input, o) abort
   let str = a:input
   let str = substitute(str, '\v(\u+)(\u\l)', '\1_\2', 'g')

@@ -131,6 +131,10 @@ Nothing about the file is Vim specific.  See
 [projectionist](https://github.com/glittershark/projectionist) for an example
 of another tool that uses it.
 
+There's currently one other tool that makes use of the `.projections.json`
+format; [projectionist](https://github.com/glittershark/projectionist), which
+provides a CLI to edit files in a manner similar to this plugin.
+
 ## License
 
 Copyright © Tim Pope.  Distributed under the same terms as Vim itself.

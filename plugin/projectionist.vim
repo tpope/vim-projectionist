@@ -3,6 +3,11 @@
 " Version:      1.0
 " GetLatestVimScripts: 4989 1 :AutoInstall: projectionist.vim
 
+if exists('g:loaded_rails')
+  echoerr "projectionist.vim was loaded after rails.vim - expect errors!"
+  finish
+endif
+
 if exists("g:loaded_projectionist") || v:version < 700 || &cp
   finish
 endif

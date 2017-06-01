@@ -122,6 +122,15 @@ named etc/rbenv.d/ or one or more files matching the glob bin/rbenv-*.
 
 Note the use of VimScript |line-continuation|.
 
+                                                *g:projectionist_autocreate_alternative_file*
+When using :A or a variant to switch to an alternative file that does not yet
+exist, projectionist will by default ask if you wish the file to be created,
+requiring you to choose from a list of possible alternatives. To save you a
+few keystrokes in the common case of there being only one alternative, setting
+|g:projectionist_autocreate_alternative_file| to 1 will mean the prompt is
+skipped and the file automatically created. If there is more than one
+alternative available, the prompt will still be shown.
+
 COMMANDS                                        *projectionist-commands*
 
 In addition to any navigation commands provided by your projections (which

@@ -443,7 +443,7 @@ function! projectionist#completion_filter(results, query, sep, ...) abort
   unlet! results
 
   let results = s:uniq(sort(copy(a:results)))
-  call filter(results,'v:val !~# "\\~$"')
+  call filter(results,'v:val !~# "\\~$" && !empty(v:val)')
   let filtered = filter(copy(results),'v:val[0:strlen(a:query)-1] ==# a:query')
   if !empty(filtered) | return filtered | endif
   if !empty(a:sep)

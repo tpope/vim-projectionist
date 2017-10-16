@@ -704,6 +704,9 @@ function! projectionist#apply_template() abort
     endif
     %delete_
     call setline(1, split(template, "\n"))
+     if exists('#User#ProjectionistApplyTemplate')
+       doautocmd User ProjectionistApplyTemplate
+     endif
     doautocmd BufReadPost
   endif
   return ''

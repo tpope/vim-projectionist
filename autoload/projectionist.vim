@@ -135,6 +135,10 @@ function! g:projectionist_transformations.uppercase(input, o) abort
   return toupper(a:input)
 endfunction
 
+function! g:projectionist_transformations.lowercase(input, o) abort
+  return tolower(a:input)
+endfunction
+
 function! g:projectionist_transformations.camelcase(input, o) abort
   return substitute(a:input, '[_-]\(.\)', '\u\1', 'g')
 endfunction

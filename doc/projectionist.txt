@@ -78,7 +78,7 @@ The full list of available properties in a projection is as follows:
         projection.  Expansions are shell escaped.
 						*projectionist-path*
 "path" ~
-        Additional directories to add to 'path'.  Can be relative to the
+        Additional directories to prepend to 'path'.  Can be relative to the
         project root or absolute.  This is useful to set on a simple file glob
         like "*.js".
 						*projectionist-start*

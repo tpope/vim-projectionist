@@ -407,7 +407,7 @@ function! projectionist#activate() abort
 
   for dir in projectionist#query_file('path')
     if stridx(','.&l:path.',', ','.escape(dir, ', ').',') < 0
-      let &l:path = &path . ',' . escape(dir, ', ')
+      let &l:path = escape(dir, ', ') . ',' . &path
     endif
   endfor
 

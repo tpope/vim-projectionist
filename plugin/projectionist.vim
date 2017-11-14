@@ -85,8 +85,13 @@ augroup projectionist
         \   let b:projectionist = getbufvar('#', 'projectionist') |
         \   call projectionist#activate() |
         \ endif
-  autocmd User NERDTreeInit,NERDTreeNewRoot
-        \ call ProjectionistDetect(b:NERDTreeRoot.path.str())
+  if exists('b:NERDTree.root')
+    autocmd User NERDTreeInit,NERDTreeNewRoot
+          \ call ProjectionistDetect(b:NERDTree.root.path.str())
+  elseif exists('b:NERDTreeRoot')
+    autocmd User NERDTreeInit,NERDTreeNewRoot
+          \ call ProjectionistDetect(b:NERDTreeRoot.path.str())
+  endif
   autocmd VimEnter *
         \ if empty(expand('<afile>:p')) |
         \   call ProjectionistDetect(resolve(getcwd())) |

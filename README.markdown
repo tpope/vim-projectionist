@@ -86,8 +86,14 @@ approach when there are multiple categories of similarly named files.)
 ### Alternate files
 
 Projectionist provides `:A`, `:AS`, `:AV`, and `:AT` to jump to an "alternate"
-file, based on ye olde convention originally established in [a.vim][].  Here's
-an example configuration for Maven that allows you to jump between the
+file, based on ye olde convention originally established in [a.vim][]:
+
+ * :A switches to the alternate file (or vise versa) 
+ * :AS splits and switches 
+ * :AV vertical splits and switches 
+ * :AT new tab and switches 
+
+Here's an example configuration for Maven that allows you to jump between the
 implementation and test:
 
     {

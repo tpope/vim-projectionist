@@ -399,9 +399,7 @@ function! projectionist#activate() abort
   endfor
 
   for [root, command] in s:query_exec_with_alternate('dispatch')
-    let offset = index(s:paths(), root) + 1
-    let b:dispatch = ':ProjectDo ' . (offset == 1 ? '' : offset.' ') .
-          \ substitute('Dispatch '.command, 'Dispatch :', '', '')
+    let b:dispatch = '-dir='.fnameescape(root).' '.command
     break
   endfor
 

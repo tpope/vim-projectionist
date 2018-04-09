@@ -348,7 +348,7 @@ endfunction
 
 function! projectionist#activate() abort
   if empty(b:projectionist)
-    finish
+    return
   endif
   command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Cd
         \ exe 'cd<bang>'  fnameescape(projectionist#path(<q-args>, <line2>))

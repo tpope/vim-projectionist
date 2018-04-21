@@ -253,19 +253,41 @@ function! projectionist#list_files_for_category(category) abort
   let projection_variants = projectionist#navigation_commands()[a:category]
   let projections = []
   for variant in projection_variants
-    call add(projections, variant[0] . projectionist#slash() . (variant[1] =~# '\*\*'
-          \ ? variant[1] : substitute(variant[1], '\*', '**/*', '')))
+    call add(projections, s:get_projection_from_variant(variant))
   endfor
+  return s:files_in_projections(projections)
+endfunction
 
-  let files_in_category = []
-  for projection in projections
+function! projectionist#list_files_for_projection(projection) abort
+  for [category, projection_variants] in items(projectionist#navigation_commands())
+    for variant in projection_variants
+      if (variant[1] !=# a:projection)
+        continue
+      else
+        let projection = s:get_projection_from_variant(variant)
+        return {category: s:files_in_projections([projection])}
+      endif
+    endfor
+  endfor
+  return {}
+endfunction
+
+function! s:get_projection_from_variant(variant) abort
+  let projection = a:variant[0] . projectionist#slash() . (a:variant[1] =~# '\*\*'
+        \ ? a:variant[1] : substitute(a:variant[1], '\*', '**/*', ''))
+  return projection
+endfunction
+
+function! s:files_in_projections(projections)
+  let files_in_projections = []
+  for projection in a:projections
     if projection !~# '\*'
       continue
     endif
     let glob = substitute(projection, '[^\/]*\ze\*\*[\/]\*', '', 'g')
-    let files_in_category += map(split(glob(glob), "\n"), '[s:match(v:val, projection), v:val]')
+    let files_in_projections += map(split(glob(glob), "\n"), '[s:match(v:val, projection), v:val]')
   endfor
-  return files_in_category
+  return files_in_projections
 endfunction
 
 function! projectionist#query_raw(key, ...) abort

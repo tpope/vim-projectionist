@@ -242,26 +242,30 @@ endfunction
 function! projectionist#list_project_files() abort
   let found_files = {}
   for [category, projection_variants] in items(projectionist#navigation_commands())
-    let projections = []
-
-    for variant in projection_variants
-      call add(projections, variant[0] . projectionist#slash() . (variant[1] =~# '\*\*'
-            \ ? variant[1] : substitute(variant[1], '\*', '**/*', '')))
-    endfor
-
-    let files_in_category = []
-    for projection in projections
-      if projection !~# '\*'
-        continue
-      endif
-      let glob = substitute(projection, '[^\/]*\ze\*\*[\/]\*', '', 'g')
-      let files_in_category += map(split(glob(glob), "\n"), '[s:match(v:val, projection), v:val]')
-    endfor
-    let found_files[category] = files_in_category
+    let found_files[category] = projectionist#list_files_for_category(category)
     " let found_files[category] =  projectionist#completion_filter(files_in_category, a:lead, '/')
   endfor
 
   return found_files
+endfunction
+
+function! projectionist#list_files_for_category(category) abort
+  let projection_variants = projectionist#navigation_commands()[a:category]
+  let projections = []
+  for variant in projection_variants
+    call add(projections, variant[0] . projectionist#slash() . (variant[1] =~# '\*\*'
+          \ ? variant[1] : substitute(variant[1], '\*', '**/*', '')))
+  endfor
+
+  let files_in_category = []
+  for projection in projections
+    if projection !~# '\*'
+      continue
+    endif
+    let glob = substitute(projection, '[^\/]*\ze\*\*[\/]\*', '', 'g')
+    let files_in_category += map(split(glob(glob), "\n"), '[s:match(v:val, projection), v:val]')
+  endfor
+  return files_in_category
 endfunction
 
 function! projectionist#query_raw(key, ...) abort

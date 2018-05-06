@@ -381,25 +381,26 @@ function! projectionist#activate() abort
     break
   endfor
 
-  for [root, command] in projectionist#query_exec('start')
+  for [root, command] in projectionist#query_exec('console')
     let offset = index(s:paths(), root) + 1
-    let b:start = ':ProjectDo ' . (offset == 1 ? '' : offset.' ') .
-          \ substitute('Start '.command, 'Start :', '', '')
+    let b:start = '-dir=' . fnameescape(root) .
+          \ ' -title=' . escape(fnamemodify(root, ':t'), '\ ') . '\ console ' .
+          \ command
+    execute 'command! -bar -bang -buffer -nargs=* Console ' .
+          \ (exists(':Start') < 2 ?
+          \ 'ProjectDo ' . (offset == 1 ? '' : offset.' ') . '!' . command :
+          \ 'Start<bang> ' . b:start) . ' <args>'
     break
   endfor
 
-  for [root, command] in projectionist#query_exec('console')
+  for [root, command] in projectionist#query_exec('start')
     let offset = index(s:paths(), root) + 1
-    execute 'command! -bar -bang -buffer -nargs=* Console ' .
-          \ 'ProjectDo ' . (offset == 1 ? '' : offset.' ') .
-          \ (exists(':Start') < 2 ? '!' : 'Start<bang> -title=' .
-          \ escape(fnamemodify(root, ':t'), '\ ') . '\ console ') .
-          \ command . ' <args>'
+    let b:start = '-dir=' . fnameescape(root) . ' ' . command
     break
   endfor
 
   for [root, command] in s:query_exec_with_alternate('dispatch')
-    let b:dispatch = '-dir='.fnameescape(root).' '.command
+    let b:dispatch = '-dir=' . fnameescape(root) . ' ' . command
     break
   endfor
 

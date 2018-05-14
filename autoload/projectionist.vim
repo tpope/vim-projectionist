@@ -78,6 +78,33 @@ function! s:join(arg) abort
   endif
 endfunction
 
+function! s:parse(mods, args) abort
+  let flags = ''
+  let pres = []
+  let cmd = {'args': []}
+  if a:mods ==# '' || a:mods ==# '<mods>'
+    let cmd.mods = ''
+  else
+    let cmd.mods = a:mods . ' '
+  endif
+  let args = copy(a:args)
+  while !empty(args)
+    if args[0] =~# "^++mods="
+      let cmd.mods .= args[0][8:-1] . ' '
+    elseif args[0] =~# '^++'
+      let flags .= ' ' . args[0]
+    elseif args[0] =~# '^+.'
+      call add(pres, args[0][1:-1])
+    elseif args[0] !=# '+'
+      call add(cmd.args, args[0])
+    endif
+    call remove(args, 0)
+  endwhile
+
+  let cmd.pre = flags . (empty(pres) ? '' : ' +'.escape(join(pres, '|'), '| '))
+  return cmd
+endfunction
+
 " Section: Querying
 
 function! s:paths() abort
@@ -342,7 +369,7 @@ function! projectionist#define_navigation_command(command, patterns) abort
   for [prefix, excmd] in items(s:prefixes)
     execute 'command! -buffer -bar -bang -nargs=* -complete=customlist,s:projection_complete'
           \ prefix . substitute(a:command, '\A', '', 'g')
-          \ ':execute s:open_projection("<mods> '.excmd.'<bang>",'.string(a:patterns).',<f-args>)'
+          \ ':execute s:open_projection("<mods>", "'.excmd.'<bang>",'.string(a:patterns).',<f-args>)'
   endfor
 endfunction
 
@@ -360,7 +387,7 @@ function! projectionist#activate() abort
   for [prefix, excmd] in items(s:prefixes) + [['', 'edit']]
     execute 'command! -buffer -bar -bang -nargs=* -range=1 -complete=customlist,s:edit_complete'
           \ 'A'.prefix
-          \ ':execute s:edit_command("<mods> '.excmd.'<bang>", <line2>, <f-args>)'
+          \ ':execute s:edit_command("<mods>", "'.excmd.'<bang>", <line2>, <f-args>)'
   endfor
   command! -buffer -bang -nargs=1 -range=0 -complete=command ProjectDo execute s:do('<bang>', <count>==<line1>?<count>:-1, <q-args>)
 
@@ -493,20 +520,22 @@ function! projectionist#navigation_commands() abort
   return commands
 endfunction
 
-function! s:open_projection(cmd, variants, ...) abort
+function! s:open_projection(mods, edit, variants, ...) abort
   let formats = []
   for variant in a:variants
     call add(formats, variant[0] . projectionist#slash() . (variant[1] =~# '\*\*'
           \ ? variant[1] : substitute(variant[1], '\*', '**/*', '')))
   endfor
-  if a:0 && a:1 ==# '&'
+  let cmd = s:parse(a:mods, a:000)
+  if get(cmd.args, -1, '') ==# '`=`'
     let s:last_formats = formats
     return ''
   endif
-  if a:0
+  if len(cmd.args)
     call filter(formats, 'v:val =~# "\\*"')
-    let dir = matchstr(a:1, '.*\ze/')
-    let base = matchstr(a:1, '[^\/]*$')
+    let name = join(cmd.args, ' ')
+    let dir = matchstr(name, '.*\ze/')
+    let base = matchstr(name, '[^\/]*$')
     call map(formats, 'substitute(substitute(v:val, "\\*\\*\\([\\/]\\=\\)", empty(dir) ? "" : dir . "\\1", ""), "\\*", base, "")')
   else
     call filter(formats, 'v:val !~# "\\*"')
@@ -524,12 +553,12 @@ function! s:open_projection(cmd, variants, ...) abort
   if !isdirectory(fnamemodify(target, ':h'))
     call mkdir(fnamemodify(target, ':h'), 'p')
   endif
-  return s:sub(a:cmd, '^%(\<mods\>)? ?', '') . ' ' .
+  return cmd.mods . a:edit . cmd.pre . ' ' .
         \ fnameescape(fnamemodify(target, ':~:.'))
 endfunction
 
 function! s:projection_complete(lead, cmdline, _) abort
-  execute matchstr(a:cmdline, '\a\@<![' . join(keys(s:prefixes), '') . ']\w\+') . ' &'
+  execute matchstr(a:cmdline, '\a\@<![' . join(keys(s:prefixes), '') . ']\w\+') . ' `=`'
   let results = []
   for format in s:last_formats
     if format !~# '\*'
@@ -559,16 +588,18 @@ function! s:jumpopt(file) abort
   endif
 endfunction
 
-function! s:edit_command(cmd, count, ...) abort
-  if a:0
-    if a:1 =~# '^[@#+]'
+function! s:edit_command(mods, edit, count, ...) abort
+  let cmd = s:parse(a:mods, a:000)
+  let file = join(cmd.args, ' ')
+  if len(file)
+    if file =~# '^[@#+]'
       return 'echoerr ":A: @/#/+ not supported"'
     endif
-    let open = s:jumpopt(projectionist#path(a:1, a:count))
+    let open = s:jumpopt(projectionist#path(file, a:count))
     if empty(open[0])
       return 'echoerr "Invalid count"'
     endif
-  elseif a:cmd =~# 'read'
+  elseif a:edit =~# 'read'
     call projectionist#apply_template()
     return ''
   else
@@ -601,7 +632,7 @@ function! s:edit_command(cmd, count, ...) abort
   if !isdirectory(fnamemodify(file, ':h'))
     call mkdir(fnamemodify(file, ':h'), 'p')
   endif
-  return s:sub(a:cmd, '^%(\<mods\>)? ?', '') . ' ' .
+  return cmd.mods . a:edit . cmd.pre . ' ' .
         \ jump . fnameescape(fnamemodify(file, ':~:.'))
 endfunction
 

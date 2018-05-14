@@ -192,4 +192,38 @@ You can also call *projectionist#path()* to get the root of the innermost set
 of projections, which is useful for implementing commands like
 |projectionist-:Cd|.
 
+FUNCTIONS                                   *projectionist-functions*
+
+Projectionist.vim exposes some functions to make interoperability with
+other plugins easier.
+
+
+                                        *projectionist#list_project_files()*
+projectionist#list_project_files()
+                Returns a dictionary of files belonging to the current
+                project, keyed on projection types. The dictionary has
+                the following form:
+>
+                {'type1': [['file1', '/home/user/full/path/to/file1'],
+                \ ['file2', '/home/user/full/path/to/file2']],
+                \ 'type2': [['file1', '/home/user/full/path/to/file1'],
+                \ ['file2', '/home/user/full/path/to/file4']]}
+<
+                The short versions of the filenames (`file1`, `file2` etc.) are
+                there for use with |projectionist-commands|.
+                For instance, `:Etype1 file1` would edit `file1`.
+
+
+                                        *projectionist#list_files_for_type()*
+projectionist#list_files_for_type({type})
+                Returns the list of files that belong to the current project and
+                are of type {type}. The list has the following form:
+>
+                [['file1', '/home/user/full/path/to/file1'],
+                \ ['file2', '/home/user/full/path/to/file2']]
+<
+                If {type} is not an existing projection type, an empty list is
+                returned. If {type} exists, calling this function is equivalent
+                to calling `projectionist#list_project_files()[{type}]`.
+
  vim:tw=78:et:ft=help:norl:

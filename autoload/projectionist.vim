@@ -239,6 +239,36 @@ function! s:match(file, pattern) abort
   return clean ==# match ? '' : clean
 endfunction
 
+function! projectionist#list_project_files() abort
+  let found_files = {}
+  for [type, projection_variants] in items(projectionist#navigation_commands())
+    let found_files[type] = projectionist#list_files_for_type(type)
+  endfor
+  return found_files
+endfunction
+
+function! projectionist#list_files_for_type(type) abort
+  let nav_commands = projectionist#navigation_commands()
+  if !has_key(nav_commands, a:type)
+    return []
+  endif
+  let projection_variants = nav_commands[a:type]
+  let projections = s:get_projections_from_variants(projection_variants)
+  return s:files_in_projections(projections)
+endfunction
+
+function! s:files_in_projections(projections) abort
+  let files_in_projections = []
+  for projection in a:projections
+    if projection !~# '\*'
+      continue
+    endif
+    let glob = s:sanitize_glob(projection)
+    let files_in_projections += map(split(glob(glob), "\n"), '[s:match(v:val, projection), v:val]')
+  endfor
+  return files_in_projections
+endfunction
+
 function! projectionist#query_raw(key, ...) abort
   let candidates = []
   let file = a:0 ? a:1 : get(b:, 'projectionist_file', expand('%:p'))
@@ -494,11 +524,7 @@ function! projectionist#navigation_commands() abort
 endfunction
 
 function! s:open_projection(cmd, variants, ...) abort
-  let formats = []
-  for variant in a:variants
-    call add(formats, variant[0] . projectionist#slash() . (variant[1] =~# '\*\*'
-          \ ? variant[1] : substitute(variant[1], '\*', '**/*', '')))
-  endfor
+  let formats = s:get_projections_from_variants(a:variants)
   if a:0 && a:1 ==# '&'
     let s:last_formats = formats
     return ''
@@ -528,6 +554,20 @@ function! s:open_projection(cmd, variants, ...) abort
         \ fnameescape(fnamemodify(target, ':~:.'))
 endfunction
 
+function! s:get_projection_from_variant(variant) abort
+  let projection = a:variant[0] . projectionist#slash() . (a:variant[1] =~# '\*\*'
+        \ ? a:variant[1] : substitute(a:variant[1], '\*', '**/*', ''))
+  return projection
+endfunction
+
+function! s:get_projections_from_variants(variants) abort
+  let projections = []
+  for variant in a:variants
+    call add(projections, s:get_projection_from_variant(variant))
+  endfor
+  return projections
+endfunction
+
 function! s:projection_complete(lead, cmdline, _) abort
   execute matchstr(a:cmdline, '\a\@<![' . join(keys(s:prefixes), '') . ']\w\+') . ' &'
   let results = []
@@ -535,11 +575,15 @@ function! s:projection_complete(lead, cmdline, _) abort
     if format !~# '\*'
       continue
     endif
-    let glob = substitute(format, '[^\/]*\ze\*\*[\/]\*', '', 'g')
+    let glob = s:sanitize_glob(format)
     let results += map(split(glob(glob), "\n"), 's:match(v:val, format)')
   endfor
   call s:uniq(results)
   return projectionist#completion_filter(results, a:lead, '/')
+endfunction
+
+function! s:sanitize_glob(glob) abort
+  return substitute(a:glob, '[^\/]*\ze\*\*[\/]\*', '', 'g')
 endfunction
 
 " Section: :A

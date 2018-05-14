@@ -69,13 +69,14 @@ function! s:has(ns, root, requirements) abort
 endfunction
 
 function! ProjectionistDetect(path) abort
+  let path = a:path
+  if path !~ '^/'
+    let path = getcwd() . '/' . path
+  endif
+
   let b:projectionist = {}
   unlet! b:projectionist_file
-  if a:path =~# '^\a[[:alnum:].+-]\+:'
-    let file = substitute(a:path, '[\/]$', '', '')
-  else
-    let file = simplify(fnamemodify(resolve(a:path), ':p:s?[\/]$??'))
-  endif
+  let file = simplify(fnamemodify(path, ':p:s?[\/]$??'))
 
   let root = file
   let ns = matchstr(file, '^\a\a\+\ze:')

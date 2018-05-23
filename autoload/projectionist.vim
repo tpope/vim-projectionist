@@ -314,10 +314,10 @@ function! s:absolute(path, in) abort
   endif
 endfunction
 
-function! projectionist#query_file(key) abort
+function! projectionist#query_file(key, ...) abort
   let files = []
   let _ = {}
-  for [root, _.match] in projectionist#query(a:key)
+  for [root, _.match] in projectionist#query(a:key, a:0 ? a:1 : {})
     call extend(files, map(filter(type(_.match) == type([]) ? copy(_.match) : [_.match], 'len(v:val)'), 's:absolute(v:val, root)'))
   endfor
   return s:uniq(files)
@@ -390,9 +390,9 @@ function! projectionist#activate() abort
     call projectionist#define_navigation_command(command, patterns)
   endfor
   for [prefix, excmd] in items(s:prefixes) + [['', 'edit']]
-    execute 'command! -buffer -bar -bang -nargs=* -range=1 -complete=customlist,s:edit_complete'
+    execute 'command! -buffer -bar -bang -nargs=* -range=-1 -complete=customlist,s:edit_complete'
           \ 'A'.prefix
-          \ ':execute s:edit_command("<mods>", "'.excmd.'<bang>", <line2>, <f-args>)'
+          \ ':execute s:edit_command("<mods>", "'.excmd.'<bang>", <count>, <f-args>)'
   endfor
   command! -buffer -bang -nargs=1 -range=0 -complete=command ProjectDo execute s:do('<bang>', <count>==<line1>?<count>:-1, <q-args>)
 
@@ -600,7 +600,7 @@ function! s:edit_command(mods, edit, count, ...) abort
     if file =~# '^[@#+]'
       return 'echoerr ":A: @/#/+ not supported"'
     endif
-    let open = s:jumpopt(projectionist#path(file, a:count))
+    let open = s:jumpopt(projectionist#path(file, a:count < 1 ? 1 : a:count))
     if empty(open[0])
       return 'echoerr "Invalid count"'
     endif
@@ -608,7 +608,11 @@ function! s:edit_command(mods, edit, count, ...) abort
     call projectionist#apply_template()
     return ''
   else
-    let alternates = projectionist#query_file('alternate')
+    let expansions = {}
+    if a:count > 0
+      let expansions.lnum = a:count
+    endif
+    let alternates = projectionist#query_file('alternate', expansions)
     let warning = get(filter(copy(alternates), 'v:val =~# "replace %.*}"'), 0, '')
     if !empty(warning)
       return 'echoerr '.string(matchstr(warning, 'replace %.*}').' in alternate projection')

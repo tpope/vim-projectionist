@@ -240,12 +240,12 @@ function! s:expand_placeholder(placeholder, expansions) abort
   return value
 endfunction
 
-function! s:expand_placeholders(value, expansions) abort
+function! s:expand_placeholders(value, expansions, ...) abort
   if type(a:value) ==# type([]) || type(a:value) ==# type({})
-    return map(copy(a:value), 's:expand_placeholders(v:val, a:expansions)')
+    return filter(map(copy(a:value), 's:expand_placeholders(v:val, a:expansions, 1)'), 'type(v:val) !=# type("") || v:val !~# "\001"')
   endif
   let value = substitute(a:value, '{[^{}]*}', '\=s:expand_placeholder(submatch(0), a:expansions)', 'g')
-  return value =~# "\001" ? '' : value
+  return !a:0 && value =~# "\001" ? '' : value
 endfunction
 
 let s:valid_key = '^\%([^*{}]*\*\*[^*{}]\{2\}\)\=[^*{}]*\*\=[^*{}]*$'
@@ -318,7 +318,7 @@ function! projectionist#query_file(key) abort
   let files = []
   let _ = {}
   for [root, _.match] in projectionist#query(a:key)
-    call extend(files, map(type(_.match) == type([]) ? copy(_.match) : [_.match], 's:absolute(v:val, root)'))
+    call extend(files, map(filter(type(_.match) == type([]) ? copy(_.match) : [_.match], 'len(v:val)'), 's:absolute(v:val, root)'))
   endfor
   return s:uniq(files)
 endfunction

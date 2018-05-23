@@ -48,6 +48,7 @@ file            absolute path to file
 project         absolute path to project
 open            literal {
 close           literal }
+nothing         empty string
 
 From a globbing perspective, "*" is actually a stand in for "**/*".  For
 advanced cases, you can include both globs explicitly: "test/**/test_*.rb".

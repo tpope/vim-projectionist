@@ -214,6 +214,10 @@ function! g:projectionist_transformations.close(input, o) abort
   return '}'
 endfunction
 
+function! g:projectionist_transformations.nothing(input, o) abort
+  return ''
+endfunction
+
 function! s:expand_placeholder(placeholder, expansions) abort
   let transforms = split(a:placeholder[1:-2], '|')
   if has_key(a:expansions, get(transforms, 0, '}'))

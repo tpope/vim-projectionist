@@ -31,7 +31,7 @@ function! ProjectionistDetect(path) abort
 
   let root = file
   let previous = ""
-  while root !=# previous
+  while root !=# previous && root !=# '.'
     if s:has(root, '.projections.json')
       try
         let value = projectionist#json_parse(readfile(root.'/.projections.json'))

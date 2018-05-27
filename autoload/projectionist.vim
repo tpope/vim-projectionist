@@ -383,9 +383,9 @@ function! projectionist#activate() abort
     return
   endif
   command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Cd
-        \ exe 'cd<bang>'  fnameescape(projectionist#path(<q-args>, <line2>))
+        \ exe 'cd' fnameescape(projectionist#path(<q-args>, <line2>))
   command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Lcd
-        \ exe 'lcd<bang>' fnameescape(projectionist#path(<q-args>, <line2>))
+        \ exe (<bang>0 ? 'cd' : 'lcd') fnameescape(projectionist#path(<q-args>, <line2>))
   for [command, patterns] in items(projectionist#navigation_commands())
     call projectionist#define_navigation_command(command, patterns)
   endfor

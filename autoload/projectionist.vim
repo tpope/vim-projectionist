@@ -105,6 +105,10 @@ function! s:parse(mods, args) abort
   return cmd
 endfunction
 
+function! projectionist#glob(path) abort
+  return split(glob(a:path), "\n")
+endfunction
+
 " Section: Querying
 
 function! s:paths() abort
@@ -493,7 +497,7 @@ function! s:dir_complete(lead, cmdline, _) abort
   let base = substitute(a:lead, '^[\/]', '', '')
   let slash = projectionist#slash()
   let c = matchstr(a:cmdline, '^\d\+')
-  let matches = split(glob(projectionist#path(substitute(base, '[\/]', '*&',  'g') . '*' . slash, c ? c : 1)), "\n")
+  let matches = projectionist#glob(projectionist#path(substitute(base, '[\/]', '*&',  'g') . '*' . slash, c ? c : 1))
   call map(matches,'matchstr(a:lead, "^[\\/]") . v:val[ strlen(projectionist#path())+1 : -1 ]')
   return matches
 endfunction
@@ -570,7 +574,7 @@ function! s:projection_complete(lead, cmdline, _) abort
       continue
     endif
     let glob = substitute(format, '[^\/]*\ze\*\*[\/]\*', '', 'g')
-    let results += map(split(glob(glob), "\n"), 's:match(v:val, format)')
+    let results += map(projectionist#glob(glob), 's:match(v:val, format)')
   endfor
   call s:uniq(results)
   return projectionist#completion_filter(results, a:lead, '/')
@@ -648,7 +652,7 @@ endfunction
 function! s:edit_complete(lead, cmdline, _) abort
   let base = substitute(a:lead, '^[\/]', '', '')
   let c = matchstr(a:cmdline, '^\d\+')
-  let matches = split(glob(projectionist#path(substitute(base, '[\/]', '*&',  'g') . '*', c ? c : 1)), "\n")
+  let matches = projectionist#glob(projectionist#path(substitute(base, '[\/]', '*&',  'g') . '*', c ? c : 1))
   call map(matches, 'matchstr(a:lead, "^[\\/]") . v:val[ strlen(projectionist#path())+1 : -1 ] . (isdirectory(v:val) ? projectionist#slash() : "")')
   return matches
 endfunction

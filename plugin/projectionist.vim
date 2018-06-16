@@ -27,7 +27,11 @@ endfunction
 function! ProjectionistDetect(path) abort
   let b:projectionist = {}
   unlet! b:projectionist_file
-  let file = simplify(fnamemodify(a:path, ':p:s?[\/]$??'))
+  if a:path =~# '^\a[[:alnum:].+-]\+:'
+    let file = substitute(a:path, '[\/]$', '', '')
+  else
+    let file = simplify(fnamemodify(resolve(a:path), ':p:s?[\/]$??'))
+  endif
 
   let root = file
   let previous = ""
@@ -83,12 +87,12 @@ augroup projectionist
   autocmd FileType *
         \ if (&filetype ==# 'netrw' && !exists('b:projectionist')) ||
         \     &buftype !~# 'nofile\|quickfix' |
-        \   call ProjectionistDetect(resolve(expand('%:p'))) |
+        \   call ProjectionistDetect(expand('%:p')) |
         \ endif
-  autocmd BufFilePost * call ProjectionistDetect(resolve(expand('<afile>:p')))
+  autocmd BufFilePost * call ProjectionistDetect(expand('<afile>:p'))
   autocmd BufNewFile,BufReadPost *
         \ if empty(&filetype) |
-        \   call ProjectionistDetect(resolve(expand('<afile>:p'))) |
+        \   call ProjectionistDetect(expand('<afile>:p')) |
         \ endif
   autocmd CmdWinEnter *
         \ if !empty(getbufvar('#', 'projectionist_file')) |
@@ -100,9 +104,9 @@ augroup projectionist
         \ call ProjectionistDetect(b:NERDTreeRoot.path.str())
   autocmd VimEnter *
         \ if empty(expand('<afile>:p')) |
-        \   call ProjectionistDetect(resolve(getcwd())) |
+        \   call ProjectionistDetect(getcwd()) |
         \ endif
-  autocmd BufWritePost .projections.json call ProjectionistDetect(resolve(expand('<afile>:p')))
+  autocmd BufWritePost .projections.json call ProjectionistDetect(expand('<afile>:p'))
   autocmd BufNewFile *
         \ if !empty(get(b:, 'projectionist')) |
         \   call projectionist#apply_template() |

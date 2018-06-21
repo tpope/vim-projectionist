@@ -105,6 +105,12 @@ function! s:parse(mods, args) abort
   return cmd
 endfunction
 
+function! s:mkdir_p(path) abort
+  if a:path !~# '^\a[[:alnum:].+-]\+:' && !isdirectory(a:path)
+    call mkdir(a:path, 'p')
+  endif
+endfunction
+
 function! projectionist#glob(path) abort
   return split(glob(a:path), "\n")
 endfunction
@@ -559,9 +565,7 @@ function! s:open_projection(mods, edit, variants, ...) abort
       break
     endif
   endfor
-  if !isdirectory(fnamemodify(target, ':h'))
-    call mkdir(fnamemodify(target, ':h'), 'p')
-  endif
+  call s:mkdir_p(fnamemodify(target, ':h'))
   return cmd.mods . a:edit . cmd.pre . ' ' .
         \ fnameescape(fnamemodify(target, ':~:.'))
 endfunction
@@ -642,9 +646,7 @@ function! s:edit_command(mods, edit, count, ...) abort
     endif
   endif
   let [file, jump] = open
-  if !isdirectory(fnamemodify(file, ':h'))
-    call mkdir(fnamemodify(file, ':h'), 'p')
-  endif
+  call s:mkdir_p(fnamemodify(file, ':h'))
   return cmd.mods . a:edit . cmd.pre . ' ' .
         \ jump . fnameescape(fnamemodify(file, ':~:.'))
 endfunction

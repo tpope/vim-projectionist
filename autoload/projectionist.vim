@@ -117,12 +117,12 @@ endfunction
 
 " Section: Querying
 
-function! s:paths() abort
+function! s:roots() abort
   return reverse(sort(keys(b:projectionist), function('projectionist#lencmp')))
 endfunction
 
 function! projectionist#path(...) abort
-  let path = get(s:paths(), a:0 > 1 ? a:2 - 1 : 0, '')
+  let path = get(s:roots(), a:0 > 1 ? a:2 - 1 : 0, '')
   if !empty(path) && a:0
     return path . projectionist#slash() . a:1
   else
@@ -132,7 +132,7 @@ endfunction
 
 function! s:all() abort
   let all = []
-  for key in s:paths()
+  for key in s:roots()
     for value in b:projectionist[key]
       call add(all, [key, value])
     endfor
@@ -424,7 +424,7 @@ function! projectionist#activate() abort
   endfor
 
   for [root, command] in projectionist#query_exec('console')
-    let offset = index(s:paths(), root) + 1
+    let offset = index(s:roots(), root) + 1
     let b:start = '-dir=' . fnameescape(root) .
           \ ' -title=' . escape(fnamemodify(root, ':t'), '\ ') . '\ console ' .
           \ command
@@ -436,7 +436,7 @@ function! projectionist#activate() abort
   endfor
 
   for [root, command] in projectionist#query_exec('start')
-    let offset = index(s:paths(), root) + 1
+    let offset = index(s:roots(), root) + 1
     let b:start = '-dir=' . fnameescape(root) . ' ' . command
     break
   endfor
@@ -452,7 +452,7 @@ function! projectionist#activate() abort
     endif
   endfor
 
-  for root in s:paths()
+  for root in s:roots()
     let tags = root . projectionist#slash() . 'tags'
     if stridx(','.&l:tags.',', ','.escape(tags, ', ').',') < 0
       let &l:tags = &tags . ',' . escape(tags, ', ')

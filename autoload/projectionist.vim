@@ -122,6 +122,9 @@ function! s:roots() abort
 endfunction
 
 function! projectionist#path(...) abort
+  if a:0 && a:1 =~# '^/\|^\a\+:'
+    return a:1
+  endif
   let path = get(s:roots(), a:0 > 1 ? a:2 - 1 : 0, '')
   if !empty(path) && a:0
     return path . projectionist#slash() . a:1

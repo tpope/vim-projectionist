@@ -155,11 +155,15 @@ function! projectionist#path(...) abort
   if a:0 && a:1 =~# '^/\|^\a\+:'
     return a:1
   endif
-  let path = get(s:roots(), a:0 > 1 ? a:2 - 1 : 0, '')
-  if !empty(path) && a:0
-    return path . projectionist#slash() . a:1
+  if a:0 > 1 && type(a:2) == type('')
+    let root = a:2
   else
-    return path
+    let root = get(s:roots(), a:0 > 1 ? a:2 - 1 : 0, '')
+  endif
+  if !empty(root) && a:0
+    return root . projectionist#slash() . a:1
+  else
+    return root
   endif
 endfunction
 

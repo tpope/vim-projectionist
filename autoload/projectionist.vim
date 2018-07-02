@@ -431,16 +431,16 @@ function! projectionist#activate() abort
   endif
   if len(s:real(s:roots()[0]))
     command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Pcd
-          \ exe 'cd' fnameescape(s:real(projectionist#path(<q-args>, <line2>)))
-    command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Plcd
-          \ exe (<bang>0 ? 'cd' : 'lcd') fnameescape(s:real(projectionist#path(<q-args>, <line2>)))
+          \ exe 'cd' s:real(projectionist#path(<q-args>, <line2>))
+    command! -buffer -bar -bang -nargs=* -range=1 -complete=customlist,s:dir_complete Plcd
+          \ exe (<bang>0 ? 'cd' : 'lcd') s:real(projectionist#path(<q-args>, <line2>))
     if exists(':Cd') != 2
       command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Cd
-            \ exe 'cd' fnameescape(s:real(projectionist#path(<q-args>, <line2>)))
+            \ exe 'cd' s:real(projectionist#path(<q-args>, <line2>))
     endif
     if exists(':Lcd') != 2
       command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Lcd
-            \ exe (<bang>0 ? 'cd' : 'lcd') fnameescape(s:real(projectionist#path(<q-args>, <line2>)))
+            \ exe (<bang>0 ? 'cd' : 'lcd') s:real(projectionist#path(<q-args>, <line2>))
     endif
     command! -buffer -bang -nargs=1 -range=0 -complete=command ProjectDo
           \ exe s:do('<bang>', <count>==<line1>?<count>:-1, <q-args>)
@@ -553,7 +553,7 @@ function! s:dir_complete(lead, cmdline, _) abort
   let slash = projectionist#slash()
   let c = matchstr(a:cmdline, '^\d\+')
   let matches = projectionist#glob(s:real(projectionist#path(substitute(base, '[\/]', '*&',  'g') . '*' . slash, c ? c : 1)))
-  call map(matches,'matchstr(a:lead, "^[\\/]") . v:val[ strlen(s:real(projectionist#path()))+1 : -1 ]')
+  call map(matches,'fnameescape(matchstr(a:lead, "^[\\/]") . v:val[ strlen(s:real(projectionist#path()))+1 : -1 ])')
   return matches
 endfunction
 
@@ -704,7 +704,7 @@ function! s:edit_complete(lead, cmdline, _) abort
   let base = substitute(a:lead, '^[\/]', '', '')
   let c = matchstr(a:cmdline, '^\d\+')
   let matches = projectionist#glob(projectionist#path(substitute(base, '[\/]', '*&',  'g') . '*', c ? c : 1))
-  call map(matches, 'matchstr(a:lead, "^[\\/]") . v:val[ strlen(projectionist#path())+1 : -1 ] . (s:fcall("isdirectory", v:val) ? projectionist#slash() : "")')
+  call map(matches, 'fnameescape(matchstr(a:lead, "^[\\/]") . v:val[ strlen(projectionist#path())+1 : -1 ] . (s:fcall("isdirectory", v:val) ? projectionist#slash() : ""))')
   return matches
 endfunction
 

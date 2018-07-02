@@ -12,14 +12,22 @@ if !exists('g:projectionist_heuristics')
   let g:projectionist_heuristics = {}
 endif
 
-function! s:has(root, file) abort
+function! s:nscall(ns, fn, path, ...) abort
+  if len(a:ns) && exists('*' . a:ns . '#' . a:fn)
+    return call(a:ns . '#' . a:fn, [a:path] + a:000)
+  else
+    return call(a:fn, [a:path] + a:000)
+  endif
+endfunction
+
+function! s:has(ns, root, file) abort
   let file = matchstr(a:file, '[^!].*')
   if file =~# '\*'
-    let found = !empty(glob(a:root . '/' . file))
+    let found = !empty(s:nscall(a:ns, 'glob', a:root . '/' . file))
   elseif file =~# '/$'
-    let found = isdirectory(a:root . '/' . file)
+    let found = s:nscall(a:ns, 'isdirectory', a:root . '/' . file)
   else
-    let found = filereadable(a:root . '/' . file)
+    let found = s:nscall(a:ns, 'filereadable', a:root . '/' . file)
   endif
   return a:file =~# '^!' ? !found : found
 endfunction
@@ -34,18 +42,19 @@ function! ProjectionistDetect(path) abort
   endif
 
   let root = file
+  let ns = matchstr(file, '^\a\a\+\ze:')
   let previous = ""
   while root !=# previous && root !=# '.'
-    if s:has(root, '.projections.json')
+    if s:nscall(ns, 'filereadable', root . '/.projections.json')
       try
-        let value = projectionist#json_parse(readfile(root.'/.projections.json'))
+        let value = projectionist#json_parse(s:nscall(ns, 'readfile', root . '/.projections.json'))
         call projectionist#append(root, value)
       catch /^invalid JSON:/
       endtry
     endif
     for [key, value] in items(g:projectionist_heuristics)
       for test in split(key, '|')
-        if empty(filter(split(test, '&'), '!s:has(root, v:val)'))
+        if empty(filter(split(test, '&'), '!s:has(ns, root, v:val)'))
           call projectionist#append(root, value)
           break
         endif

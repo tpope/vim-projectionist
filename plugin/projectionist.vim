@@ -101,7 +101,9 @@ augroup projectionist
         \   call projectionist#activate() |
         \ endif
   autocmd User NERDTreeInit,NERDTreeNewRoot
-        \ call ProjectionistDetect(b:NERDTree.root.path.str())
+        \ if exists('b:NERDTree.root.path.str') |
+        \   call ProjectionistDetect(b:NERDTree.root.path.str()) |
+        \ endif
   autocmd VimEnter *
         \ if empty(expand('<afile>:p')) |
         \   call ProjectionistDetect(getcwd()) |

@@ -49,6 +49,8 @@ function! s:real(file) abort
     let path = a:file
   elseif exists('*' . pre . 'Path')
     let path = {pre}Path(a:file)
+  elseif exists('*' . pre . 'Real')
+    let path = {pre}Real(a:file)
   else
     return ''
   endif

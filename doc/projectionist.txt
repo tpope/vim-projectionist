@@ -148,13 +148,15 @@ are available.
 
 :AD {file}              Like :A, but |:read| the file into the current buffer.
 
+                                                *projectionist-:Pcd*
                                                 *projectionist-:Cd*
-:Cd                     |:cd| to the innermost root.
+:Pcd                     |:cd| to the innermost root.
 
-:Cd {path}              |:cd| to {path} in the innermost root.
+:Pcd {path}              |:cd| to {path} in the innermost root.
 
+                                                *projectionist-:Plcd*
                                                 *projectionist-:Lcd*
-:Lcd [path]             Like :Cd, but use |:lcd|.
+:Plcd [path]             Like :Pcd, but use |:lcd|.
 
                                                 *projectionist-:ProjectDo*
 :ProjectDo {cmd}        Change directory to the project root, execute the
@@ -191,6 +193,6 @@ pattern may prove useful:
 <
 You can also call *projectionist#path()* to get the root of the innermost set
 of projections, which is useful for implementing commands like
-|projectionist-:Cd|.
+|projectionist-:Pcd|.
 
  vim:tw=78:et:ft=help:norl:

@@ -751,6 +751,9 @@ augroup END
 
 function! projectionist#apply_template() abort
   let template = get(projectionist#query('template'), 0, ['', ''])[1]
+  if type(template) == type([]) && type(get(template, 0)) == type([])
+    let template = template[0]
+  endif
   if type(template) == type([])
     let l:.template = join(template, "\n")
   endif

@@ -731,7 +731,7 @@ endfunction
 " Section: Make
 
 function! s:qf_pre() abort
-  let dir = substitute(matchstr(','.&l:errorformat, ',\%(%\\&\)\=chdir \zs\%(\\.\|[^,]\)*'), '\\,' ,',', 'g')
+  let dir = substitute(matchstr(','.&l:errorformat, ',\%(%\\&\)\=chdir[ =]\zs\%(\\.\|[^,]\)*'), '\\,' ,',', 'g')
   let cwd = getcwd()
   if !empty(dir) && dir !=# cwd
     let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'

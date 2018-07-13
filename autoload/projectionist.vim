@@ -272,15 +272,15 @@ function! s:expand_placeholder(placeholder, expansions) abort
   if has_key(a:expansions, get(transforms, 0, '}'))
     let value = a:expansions[remove(transforms, 0)]
   else
-    let value = get(a:expansions, 'match', "\001")
+    let value = get(a:expansions, 'match', "\030")
   endif
   for transform in transforms
     if !has_key(g:projectionist_transformations, transform)
-      return "\001"
+      return "\030"
     endif
     let value = g:projectionist_transformations[transform](value, a:expansions)
-    if value =~# "\001"
-      return "\001"
+    if value =~# "\030"
+      return "\030"
     endif
   endfor
   if has_key(a:expansions, 'post_function')
@@ -291,10 +291,10 @@ endfunction
 
 function! s:expand_placeholders(value, expansions, ...) abort
   if type(a:value) ==# type([]) || type(a:value) ==# type({})
-    return filter(map(copy(a:value), 's:expand_placeholders(v:val, a:expansions, 1)'), 'type(v:val) !=# type("") || v:val !~# "\001"')
+    return filter(map(copy(a:value), 's:expand_placeholders(v:val, a:expansions, 1)'), 'type(v:val) !=# type("") || v:val !~# "[\001-\006\016-\037]"')
   endif
   let value = substitute(a:value, '{[^{}]*}', '\=s:expand_placeholder(submatch(0), a:expansions)', 'g')
-  return !a:0 && value =~# "\001" ? '' : value
+  return !a:0 && value =~# "[\001-\006\016-\037]" ? '' : value
 endfunction
 
 let s:valid_key = '^\%([^*{}]*\*\*[^*{}]\{2\}\)\=[^*{}]*\*\=[^*{}]*$'

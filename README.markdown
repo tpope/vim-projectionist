@@ -73,8 +73,9 @@ Here are some examples for this very project:
 
 With these in place, you could use `:Eplugin projectionist` to edit
 `plugin/projectionist.vim` and `:Edoc projectionist` to edit
-`doc/projectionist.txt`.  For `README.markdown`, since there's no glob, it
-becomes the default destination for `:Edoc` if no argument is given.
+`doc/projectionist.txt`.  If no argument is given, it will edit an alternate
+file of that type (see below) or a projection without a glob.  So in this
+example `:Edoc` would default to editing `README.markdown`.
 
 The `E` stands for `edit`.  You also get `S`, `V`, and `T` variants that
 `split`, `vsplit`, and `tabedit`.
@@ -94,6 +95,9 @@ implementation and test:
       "src/main/java/*.java": {"alternate": "src/test/java/{}.java"},
       "src/test/java/*.java": {"alternate": "src/main/java/{}.java"}
     }
+
+In addition, the navigation commands (like `:Eplugin` above) will search
+alternates when no argument is given to edit a related file of that type.
 
 Bonus feature: `:A {filename}` edits a file relative to the root of the
 project.

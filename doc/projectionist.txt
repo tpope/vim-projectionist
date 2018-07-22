@@ -62,7 +62,8 @@ The full list of available properties in a projection is as follows:
 						*projectionist-alternate*
 "alternate" ~
         Determines the destination of the |projectionist-:A| command.  If this
-        is a list, the first readable file will be used.
+        is a list, the first readable file will be used.  Will also be used as
+        a default for |projectionist-related|.
 						*projectionist-console*
 "console" ~
         Command to run to start a REPL or other interactive shell.  Will be
@@ -99,6 +100,11 @@ The full list of available properties in a projection is as follows:
         this option is provided for a literal filename rather than a glob, it
         is used as the default destination of the navigation command when no
         argument is given.
+						*projectionist-related*
+"related" ~
+        Indicates one or more files to search when a navigation command is
+        called without an argument, to find a default destination.  Related
+        files are searched recursively.
 
                                                 *g:projectionist_heuristics*
 In addition to ".projections.json", projections can be defined globally

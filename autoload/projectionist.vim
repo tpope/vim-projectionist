@@ -450,6 +450,41 @@ function! projectionist#query_file(key, ...) abort
   return s:uniq(files)
 endfunction
 
+let s:projectionist_max_file_recursion = 3
+
+function! s:query_file_recursive(key, ...) abort
+  let keys = type(a:key) == type([]) ? a:key : [a:key]
+  let start_file = get(a:0 ? a:1 : {}, 'file', get(b:, 'projectionist_file', expand('%:p')))
+  let files = []
+  let visited_files = {start_file: 1}
+  let current_files = [start_file]
+  let depth = 0
+  while !empty(current_files) && depth < s:projectionist_max_file_recursion
+    let next_files = []
+    for file in current_files
+      let query_opts = extend(a:0 ? copy(a:1) : {}, {'file': file})
+      for key in keys
+        let [root, match] = get(projectionist#query(key, query_opts), 0, ['', []])
+        let subfiles = type(match) == type([]) ? copy(match) : [match]
+        call map(filter(subfiles, 'len(v:val)'), 's:absolute(v:val, root)')
+        if !empty(subfiles)
+          break
+        endif
+      endfor
+      for subfile in subfiles
+        if !has_key(visited_files, subfile)
+          let visited_files[subfile] = 1
+          call add(files, subfile)
+          call add(next_files, subfile)
+        endif
+      endfor
+    endfor
+    let current_files = next_files
+    let depth += 1
+  endwhile
+  return files
+endfunction
+
 function! s:shelljoin(val) abort
   return substitute(s:join(a:val), '["'']\([{}]\)["'']', '\1', 'g')
 endfunction
@@ -674,6 +709,38 @@ function! projectionist#navigation_commands() abort
   return commands
 endfunction
 
+function! s:find_related_file(patterns) abort
+  let alternates = s:query_file_recursive(['related', 'alternate'], {'lnum': 0})
+  for alternate in alternates
+    for pattern in a:patterns
+      if !empty(s:match(alternate, pattern))
+        return alternate
+      endif
+    endfor
+  endfor
+  let current_file = get(b:, 'projectionist_file', expand('%:p'))
+  for pattern in a:patterns
+    if pattern !~# '\*'
+      continue
+    endif
+    for candidate in projectionist#glob(pattern)
+      let candidate_alternates = s:query_file_recursive(
+            \ ['related', 'alternate'],
+            \ {'lnum': 0, 'file': candidate})
+      for candidate_alternate in candidate_alternates
+        if candidate_alternate ==# current_file
+          return candidate
+        endif
+        for alternate in alternates
+          if alternate ==# candidate_alternate
+            return candidate
+          endif
+        endfor
+      endfor
+    endfor
+  endfor
+endfunction
+
 function! s:open_projection(mods, edit, variants, ...) abort
   let formats = []
   for variant in a:variants
@@ -692,7 +759,12 @@ function! s:open_projection(mods, edit, variants, ...) abort
     let base = matchstr(name, '[^\/]*$')
     call map(formats, 'substitute(substitute(v:val, "\\*\\*\\([\\/]\\=\\)", empty(dir) ? "" : dir . "\\1", ""), "\\*", base, "")')
   else
-    call filter(formats, 'v:val !~# "\\*"')
+    let related_file = s:find_related_file(formats)
+    if !empty(related_file)
+      let formats = [related_file]
+    else
+      call filter(formats, 'v:val !~# "\\*"')
+    endif
   endif
   if empty(formats)
     return 'echoerr "Invalid number of arguments"'

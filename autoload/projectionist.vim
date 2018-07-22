@@ -150,7 +150,7 @@ endfunction
 " Section: Querying
 
 function! s:roots() abort
-  return reverse(sort(keys(b:projectionist), function('projectionist#lencmp')))
+  return reverse(sort(keys(get(b:, 'projectionist', {})), function('projectionist#lencmp')))
 endfunction
 
 function! projectionist#path(...) abort

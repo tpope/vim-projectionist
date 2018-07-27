@@ -57,7 +57,7 @@ function! ProjectionistDetect(path) abort
   while root !=# previous && root !=# '.'
     if s:nscall(ns, 'filereadable', root . '/.projections.json')
       try
-        let value = projectionist#json_parse(s:nscall(ns, 'readfile', root . '/.projections.json'))
+        let value = projectionist#json_parse(projectionist#readfile(root . '/.projections.json'))
         call projectionist#append(root, value)
       catch /^invalid JSON:/
       endtry

@@ -144,6 +144,22 @@ function! s:mkdir_p(path) abort
   endif
 endfunction
 
+function! projectionist#filereadable(path) abort
+  return s:fcall('filereadable', a:path)
+endfunction
+
+function! projectionist#isdirectory(path) abort
+  return s:fcall('isdirectory', a:path)
+endfunction
+
+function! projectionist#getftime(path) abort
+  return s:fcall('getftime', a:path)
+endfunction
+
+function! projectionist#readfile(...) abort
+  return call('s:fcall', ['readfile'] + a:000)
+endfunction
+
 function! projectionist#glob(path) abort
   let ns = matchstr(a:path, '^\a\a\+\ze:')
   if len(ns) && exists('*' . ns . '#glob')
@@ -625,7 +641,7 @@ function! s:open_projection(mods, edit, variants, ...) abort
   endif
   let target = formats[0]
   for format in formats
-    if s:fcall('filereadable', format)
+    if projectionist#filereadable(format)
       let target = format
       break
     endif
@@ -691,7 +707,7 @@ function! s:edit_command(mods, edit, count, ...) abort
       return 'echoerr '.string(matchstr(warning, 'replace %.*}').' in alternate projection')
     endif
     call map(alternates, 's:jumpopt(v:val)')
-    let open = get(filter(copy(alternates), 's:fcall("getftime", v:val[0]) >= 0'), 0, [])
+    let open = get(filter(copy(alternates), 'projectionist#getftime(v:val[0]) >= 0'), 0, [])
     if empty(alternates)
       return 'echoerr "No alternate file"'
     elseif empty(open)
@@ -720,7 +736,7 @@ function! s:edit_complete(lead, cmdline, _) abort
   let base = substitute(a:lead, '^[\/]', '', '')
   let c = matchstr(a:cmdline, '^\d\+')
   let matches = projectionist#glob(projectionist#path(substitute(base, '[\/]', '*&',  'g') . '*', c ? c : 1))
-  call map(matches, 'fnameescape(matchstr(a:lead, "^[\\/]") . v:val[ strlen(projectionist#path())+1 : -1 ] . (s:fcall("isdirectory", v:val) ? projectionist#slash() : ""))')
+  call map(matches, 'fnameescape(matchstr(a:lead, "^[\\/]") . v:val[ strlen(projectionist#path())+1 : -1 ] . (projectionist#isdirectory(v:val) ? projectionist#slash() : ""))')
   return matches
 endfunction
 

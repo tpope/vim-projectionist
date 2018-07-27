@@ -43,6 +43,9 @@ function! ProjectionistDetect(path) abort
 
   let root = file
   let ns = matchstr(file, '^\a\a\+\ze:')
+  if len(ns) && get(g:, 'projectionist_ignore_' . ns)
+    return
+  endif
   let previous = ""
   while root !=# previous && root !=# '.'
     if s:nscall(ns, 'filereadable', root . '/.projections.json')

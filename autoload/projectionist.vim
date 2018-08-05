@@ -160,15 +160,6 @@ function! projectionist#readfile(...) abort
   return call('s:fcall', ['readfile'] + a:000)
 endfunction
 
-function! projectionist#glob(path) abort
-  let ns = matchstr(a:path, '^\a\a\+\ze:')
-  if len(ns) && exists('*' . ns . '#glob')
-    return call(ns . '#glob', [a:path, 0, 1])
-  else
-    return split(glob(a:path), "\n")
-  endif
-endfunction
-
 " Section: Querying
 
 function! s:roots() abort
@@ -176,7 +167,7 @@ function! s:roots() abort
 endfunction
 
 function! projectionist#path(...) abort
-  if a:0 && a:1 =~# '^/\|^\a\+:'
+  if a:0 && a:1 =~# '^[' . projectionist#slash() . '/]\|^\a\+:'
     return a:1
   endif
   if a:0 > 1 && type(a:2) == type('')
@@ -188,6 +179,16 @@ function! projectionist#path(...) abort
     return root . projectionist#slash() . a:1
   else
     return root
+  endif
+endfunction
+
+function! projectionist#glob(path, ...) abort
+  let path = a:0 ? projectionist#path(a:path, a:1) : a:path
+  let ns = matchstr(path, '^\a\a\+\ze:')
+  if len(ns) && exists('*' . ns . '#glob')
+    return call(ns . '#glob', [path, 0, 1])
+  else
+    return split(glob(path), "\n")
   endif
 endfunction
 
@@ -735,7 +736,7 @@ endfunction
 function! s:edit_complete(lead, cmdline, _) abort
   let base = substitute(a:lead, '^[\/]', '', '')
   let c = matchstr(a:cmdline, '^\d\+')
-  let matches = projectionist#glob(projectionist#path(substitute(base, '[\/]', '*&',  'g') . '*', c ? c : 1))
+  let matches = projectionist#glob(substitute(base, '[\/]', '*&',  'g') . '*', c ? c : 1)
   call map(matches, 'fnameescape(matchstr(a:lead, "^[\\/]") . v:val[ strlen(projectionist#path())+1 : -1 ] . (projectionist#isdirectory(v:val) ? projectionist#slash() : ""))')
   return matches
 endfunction

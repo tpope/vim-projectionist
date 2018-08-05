@@ -144,22 +144,6 @@ function! s:mkdir_p(path) abort
   endif
 endfunction
 
-function! projectionist#filereadable(path) abort
-  return s:fcall('filereadable', a:path)
-endfunction
-
-function! projectionist#isdirectory(path) abort
-  return s:fcall('isdirectory', a:path)
-endfunction
-
-function! projectionist#getftime(path) abort
-  return s:fcall('getftime', a:path)
-endfunction
-
-function! projectionist#readfile(...) abort
-  return call('s:fcall', ['readfile'] + a:000)
-endfunction
-
 " Section: Querying
 
 function! s:roots() abort
@@ -198,8 +182,37 @@ function! projectionist#path(...) abort
   endif
 endfunction
 
-function! projectionist#glob(path, ...) abort
-  let path = a:0 ? projectionist#path(a:path, a:1) : a:path
+function! s:path(path, ...) abort
+  if a:0 || type(a:path) == type(0)
+    return call('projectionist#path', [a:path] + a:000)
+  else
+    return a:path
+  endif
+endfunction
+
+function! projectionist#filereadable(...) abort
+  return s:fcall('filereadable', call('s:path', a:000))
+endfunction
+
+function! projectionist#isdirectory(...) abort
+  return s:fcall('isdirectory', call('s:path', a:000))
+endfunction
+
+function! projectionist#getftime(...) abort
+  return s:fcall('getftime', call('s:path', a:000))
+endfunction
+
+function! projectionist#readfile(path, ...) abort
+  let args = copy(a:000)
+  let path = a:path
+  if get(args, 0, '') =~# '[\/.]' || type(get(args, 0, '')) == type(0) || type(path) == type(0)
+    let path = projectionist#path(path, remove(args, 0))
+  endif
+  return call('s:fcall', ['readfile'] + [path] + args)
+endfunction
+
+function! projectionist#glob(...) abort
+  let path = call('s:path', a:000)
   let ns = matchstr(path, '^\a\a\+\ze:')
   if len(ns) && exists('*' . ns . '#glob')
     return call(ns . '#glob', [path, 0, 1])

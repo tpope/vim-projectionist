@@ -218,13 +218,10 @@ function! projectionist#glob(file, ...) abort
     let root = projectionist#path('', a:1)
   endif
   let path = s:absolute(a:file, root)
-  let ns = matchstr(path, '^\a\a\+\ze:')
-  if len(ns) && exists('*' . ns . '#glob')
-    let files = call(ns . '#glob', [path, a:0 > 1 ? a:2 : 0, 1])
-  elseif v:version >= 704
-    let files = glob(path, a:0 > 1 ? a:2 : 0, 1)
+  if v:version >= 704
+    let files = s:fcall('glob', path, a:0 > 1 ? a:2 : 0, 1)
   else
-    let files = split(glob(path), "\n")
+    let files = split(s:fcall('glob', path), "\n")
   endif
   if len(root) || a:0 && a:1 is# 0
     call map(files, 's:slash(v:val) . (v:val !~# "[\/]$" && projectionist#isdirectory(v:val) ? "/" : "")')

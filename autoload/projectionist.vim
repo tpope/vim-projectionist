@@ -46,13 +46,11 @@ endfunction
 function! s:real(file) abort
   let pre = substitute(matchstr(a:file, '^\a\a\+\ze:'), '^.', '\u&', '')
   if empty(pre)
-    let path = a:file
+    let path = s:absolute(a:file, getcwd())
   elseif exists('*' . pre . 'Real')
     let path = {pre}Real(a:file)
-  elseif exists('*' . pre . 'Path')
-    let path = {pre}Path(a:file)
   else
-    return ''
+    let path = a:file
   endif
   return exists('+shellslash') && !&shellslash ? tr(path, '/', '\') : path
 endfunction

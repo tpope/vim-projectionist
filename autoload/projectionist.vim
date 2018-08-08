@@ -236,7 +236,7 @@ function! projectionist#glob(file, ...) abort
 endfunction
 
 function! projectionist#real(...) abort
-  return s:real(call('projectionist#path', a:000))
+  return s:real(call('s:path', a:000))
 endfunction
 
 function! s:all() abort

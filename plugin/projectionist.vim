@@ -8,6 +8,23 @@ if exists("g:loaded_projectionist") || v:version < 700 || &cp
 endif
 let g:loaded_projectionist = 1
 
+" ProjectionistHas('Gemfile&lib/|*.gemspec', '/path/to/root')
+function! ProjectionistHas(req, ...) abort
+  if type(a:req) != type('')
+    return
+  endif
+  let ns = matchstr(a:0 ? a:1 : a:req, '^\a\a\+\ze:')
+  call s:load(ns)
+  if !a:0
+    return s:nscall(ns, a:req =~# '[\/]$' ? 'isdirectory' : 'filereadable', a:req)
+  endif
+  for test in split(a:req, '|')
+    if s:has(ns, a:1, test)
+      return 1
+    endif
+  endfor
+endfunction
+
 if !exists('g:projectionist_heuristics')
   let g:projectionist_heuristics = {}
 endif
@@ -16,24 +33,38 @@ if !exists('s:loaded')
   let s:loaded = {}
 endif
 
+function! s:load(ns) abort
+  if len(a:ns) && !has_key(s:loaded, a:ns) && len(findfile('autoload/' . a:ns . '.vim', escape(&rtp, ' ')))
+    exe 'runtime! autoload/' . a:ns . '.vim'
+  endif
+endfunction
+
 function! s:nscall(ns, fn, path, ...) abort
-  if len(a:ns) && exists('*' . a:ns . '#' . a:fn)
+  if len(a:ns) && !get(g:, 'projectionist_ignore_' . a:ns) && exists('*' . a:ns . '#' . a:fn)
     return call(a:ns . '#' . a:fn, [a:path] + a:000)
   else
     return call(a:fn, [a:path] + a:000)
   endif
 endfunction
 
-function! s:has(ns, root, file) abort
-  let file = matchstr(a:file, '[^!].*')
-  if file =~# '\*'
-    let found = !empty(s:nscall(a:ns, 'glob', a:root . '/' . file))
-  elseif file =~# '/$'
-    let found = s:nscall(a:ns, 'isdirectory', a:root . '/' . file)
-  else
-    let found = s:nscall(a:ns, 'filereadable', a:root . '/' . file)
+function! s:has(ns, root, requirements) abort
+  if empty(a:requirements)
+    return 0
   endif
-  return a:file =~# '^!' ? !found : found
+  for test in split(a:requirements, '&')
+    let file = a:root . '/' . matchstr(test, '[^!].*')
+    if file =~# '\*'
+      let found = !empty(s:nscall(a:ns, 'glob', file))
+    elseif file =~# '/$'
+      let found = s:nscall(a:ns, 'isdirectory', file)
+    else
+      let found = s:nscall(a:ns, 'filereadable', file)
+    endif
+    if test =~# '^!' ? found : !found
+      return 0
+    endif
+  endfor
+  return 1
 endfunction
 
 function! ProjectionistDetect(path) abort
@@ -50,9 +81,7 @@ function! ProjectionistDetect(path) abort
   if len(ns) && get(g:, 'projectionist_ignore_' . ns)
     return
   endif
-  if len(ns) && !has_key(s:loaded, ns) && len(findfile('autoload/' . ns . '.vim', escape(&rtp, ' ')))
-    exe 'runtime! autoload/' . ns . '.vim'
-  endif
+  call s:load(ns)
   let previous = ""
   while root !=# previous && root !=# '.'
     if s:nscall(ns, 'filereadable', root . '/.projections.json')
@@ -64,7 +93,7 @@ function! ProjectionistDetect(path) abort
     endif
     for [key, value] in items(g:projectionist_heuristics)
       for test in split(key, '|')
-        if empty(filter(split(test, '&'), '!s:has(ns, root, v:val)'))
+        if s:has(ns, root, test)
           call projectionist#append(root, value)
           break
         endif

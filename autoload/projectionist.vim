@@ -150,8 +150,8 @@ function! s:roots() abort
 endfunction
 
 function! projectionist#path(...) abort
-  let abs = '^[' . projectionist#slash() . '/]\|^\a\+:'
-  if a:0 && a:1 =~# abs || (a:0 > 1 && a:2 is# 0)
+  let abs = '^[' . projectionist#slash() . '/]\|^\a\+:\|^\.\.\=\%(/\|$\)\|^$'
+  if a:0 && s:slash(a:1) =~# abs || (a:0 > 1 && a:2 is# 0)
     return s:slash(a:1)
   endif
   if a:0 && type(a:1) ==# type(0)

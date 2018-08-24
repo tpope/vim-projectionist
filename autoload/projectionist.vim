@@ -631,7 +631,7 @@ function! projectionist#completion_filter(results, query, sep, ...) abort
 endfunction
 
 function! s:dir_complete(lead, cmdline, _) abort
-  let pattern = substitute(a:lead, '\%(^\%(\a\+:\)\=\)\@!/', '*&', 'g') . '*/'
+  let pattern = substitute(a:lead, '^\@!\%(^\a\+:/*\)\@<!\%(^\.\.\=\)\@<!/', '*&', 'g') . '*/'
   let c = matchstr(a:cmdline, '^\d\+')
   let matches = projectionist#glob(pattern, projectionist#real(c ? c : 1))
   return map(matches, 'fnameescape(v:val)')
@@ -781,7 +781,7 @@ function! s:edit_command(mods, edit, count, ...) abort
 endfunction
 
 function! s:edit_complete(lead, cmdline, _) abort
-  let pattern = substitute(a:lead, '\%(^\%(\a\+:\)\=\)\@!/', '*&', 'g') . '*'
+  let pattern = substitute(a:lead, '^\@!\%(^\a\+:/*\)\@<!\%(^\.\.\=\)\@<!/', '*&', 'g') . '*'
   let c = matchstr(a:cmdline, '^\d\+')
   let matches = projectionist#glob(pattern, c ? c : 1)
   return map(matches, 'fnameescape(v:val)')

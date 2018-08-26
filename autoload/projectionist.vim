@@ -483,7 +483,7 @@ function! projectionist#append(root, ...) abort
     return
   endif
   let projections = get(a:000, -1, {})
-  if type(projections) == type('')
+  if type(projections) == type('') && !empty(projections)
     try
       let l:.projections = projectionist#json_parse(projectionist#readfile(projections, a:root))
     catch

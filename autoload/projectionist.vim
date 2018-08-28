@@ -493,10 +493,11 @@ function! projectionist#append(root, ...) abort
     endtry
   endif
   if type(projections) == type({})
-    if !has_key(b:projectionist, a:root)
-      let b:projectionist[a:root] = []
+    let root = projectionist#slash(substitute(a:root, '[' . projectionist#slash() . '/]$', '', ''))
+    if !has_key(b:projectionist, root)
+      let b:projectionist[root] = []
     endif
-    call add(b:projectionist[a:root], filter(projections, 'type(v:val) == type({})'))
+    call add(b:projectionist[root], filter(projections, 'type(v:val) == type({})'))
     return 1
   endif
 endfunction

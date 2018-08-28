@@ -150,7 +150,7 @@ function! s:roots() abort
 endfunction
 
 function! projectionist#path(...) abort
-  let abs = '^[' . projectionist#slash() . '/]\|^\a\+:\|^\.\.\=\%(/\|$\)\|^$'
+  let abs = '^[' . projectionist#slash() . '/]\|^\a\+:\|^\.\.\=\%(/\|$\)'
   if a:0 && s:slash(a:1) =~# abs || (a:0 > 1 && a:2 is# 0)
     return s:slash(a:1)
   endif
@@ -168,6 +168,8 @@ function! projectionist#path(...) abort
     if empty(root)
       return file
     endif
+  elseif a:0 == 1 && empty(a:1)
+    return ''
   else
     let root = get(s:roots(), a:0 > 1 ? (a:2 < 0 ? -a:2 : a:2) - 1 : 0, '')
     if a:0

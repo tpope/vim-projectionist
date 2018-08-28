@@ -513,16 +513,16 @@ function! projectionist#activate() abort
   endif
   if len(s:real(s:roots()[0]))
     command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Pcd
-          \ exe 'cd' projectionist#real(<q-args>, <line2>)
+          \ exe 'cd' projectionist#real(projectionist#path(<line2>) . '/' . <q-args>)
     command! -buffer -bar -bang -nargs=* -range=1 -complete=customlist,s:dir_complete Plcd
-          \ exe (<bang>0 ? 'cd' : 'lcd') projectionist#real(<q-args>, <line2>)
+          \ exe (<bang>0 ? 'cd' : 'lcd') projectionist#real(projectionist#path(<line2>) . '/' . <q-args>)
     if exists(':Cd') != 2
       command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Cd
-            \ exe 'cd' projectionist#real(<q-args>, <line2>)
+            \ exe 'cd' projectionist#real(projectionist#path(<line2>) . '/' . <q-args>)
     endif
     if exists(':Lcd') != 2
       command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Lcd
-            \ exe (<bang>0 ? 'cd' : 'lcd') projectionist#real(<q-args>, <line2>)
+            \ exe (<bang>0 ? 'cd' : 'lcd') projectionist#real(projectionist#path(<line2>) . '/' . <q-args>)
     endif
     command! -buffer -bang -nargs=1 -range=0 -complete=command ProjectDo
           \ exe s:do('<bang>', <count>==<line1>?<count>:-1, <q-args>)

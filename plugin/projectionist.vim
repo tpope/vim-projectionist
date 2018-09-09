@@ -36,6 +36,7 @@ endif
 function! s:load(ns) abort
   if len(a:ns) && !has_key(s:loaded, a:ns) && len(findfile('autoload/' . a:ns . '.vim', escape(&rtp, ' ')))
     exe 'runtime! autoload/' . a:ns . '.vim'
+    let s:loaded[a:ns] = 1
   endif
 endfunction
 

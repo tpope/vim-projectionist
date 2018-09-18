@@ -494,7 +494,7 @@ function! projectionist#append(root, ...) abort
     endtry
   endif
   if type(projections) == type({})
-    let root = projectionist#slash(substitute(a:root, '[' . projectionist#slash() . '/]$', '', ''))
+    let root = projectionist#slash(substitute(a:root, '.\zs[' . projectionist#slash() . '/]$', '', ''))
     if !has_key(b:projectionist, root)
       let b:projectionist[root] = []
     endif

@@ -82,7 +82,13 @@ function! projectionist#shellescape(arg) abort
 endfunction
 
 function! projectionist#shellpath(arg) abort
-  return empty(a:arg) ? '' : projectionist#shellescape(s:real(a:arg))
+  if empty(a:arg)
+    return ''
+  elseif a:arg =~# '^[[:alnum:].+-]\+:'
+    return projectionist#shellescape(s:real(a:arg))
+  else
+    return projectionist#shellescape(a:arg)
+  endif
 endfunction
 
 function! s:join(arg) abort
@@ -428,7 +434,7 @@ function! projectionist#query(key, ...) abort
 endfunction
 
 function! s:absolute(path, in) abort
-  if a:path =~# '^\%([[:alnum:].-]\+:\)\|^\.\?[\/]\|^$'
+  if a:path =~# '^\%([[:alnum:].+-]\+:\)\|^\.\?[\/]\|^$'
     return a:path
   else
     return substitute(a:in, '[\/]$', '', '') . projectionist#slash() . a:path

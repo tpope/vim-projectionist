@@ -134,7 +134,7 @@ endfunction
 augroup projectionist
   autocmd!
   autocmd FileType *
-        \ if (&filetype ==# 'netrw' && !exists('b:projectionist')) ||
+        \ if (&filetype !=# 'netrw' || !exists('b:projectionist')) &&
         \     &buftype !~# 'nofile\|quickfix' |
         \   call ProjectionistDetect(expand('%:p')) |
         \ endif

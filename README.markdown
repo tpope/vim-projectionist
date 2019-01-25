@@ -132,6 +132,11 @@ Nothing about the file is Vim specific.  See
 [projectionist](https://github.com/glittershark/projectionist) for an example
 of another tool that uses it.
 
+## See Also
+
+* A Vim plugin for managing your makeprgs.
+    [vim-makery](https://github.com/igemnace/vim-makery)
+
 ## License
 
 Copyright © Tim Pope.  Distributed under the same terms as Vim itself.

@@ -546,20 +546,24 @@ function! projectionist#activate() abort
           \ ':execute s:edit_command("<mods>", "'.excmd.'<bang>", <count>, <f-args>)'
   endfor
 
-  for [root, makeprg] in projectionist#query_exec('make')
+  for [root, compile] in projectionist#query_exec('compile')
     unlet! b:current_compiler
-    let compiler = fnamemodify(matchstr(makeprg, '\S\+'), ':t:r')
+    let compiler = fnamemodify(matchstr(compile, '\S\+'), ':t:r')
     setlocal errorformat=%+I%.%#,
     if exists(':Dispatch')
-      silent! let compiler = dispatch#compiler_for_program(makeprg)
+      silent! let compiler = dispatch#compiler_for_program(compile)
     endif
     if !empty(findfile('compiler/'.compiler.'.vim', escape(&rtp, ' ')))
       execute 'compiler' compiler
     elseif compiler ==# 'make'
       setlocal errorformat<
     endif
-    let &l:makeprg = makeprg
     let &l:errorformat .= ',%\&chdir '.escape(root, ',')
+    break
+  endfor
+
+  for [root, makeprg] in projectionist#query_exec('makeprg')
+    let &l:makeprg = makeprg
     break
   endfor
 

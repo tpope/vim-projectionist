@@ -58,8 +58,8 @@ necessary, the dirname and basename expansions can be used to split the value
 back apart.
 
 While setting up projections, you will wonder how to reload ".projections.json".
-You do not need to restart Vim, reloading the ".projections.json" buffer 
-(with e for instance) will reload the projections.  
+You do not need to restart Vim, writing the ".projections.json" buffer 
+(with :w for instance) will reload the projections.  
 
 The full list of available properties in a projection is as follows:
 

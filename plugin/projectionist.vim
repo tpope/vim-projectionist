@@ -131,6 +131,10 @@ function! ProjectionistDetect(path) abort
   endif
 endfunction
 
+if !exists('g:did_load_ftplugin')
+  filetype plugin on
+endif
+
 augroup projectionist
   autocmd!
   autocmd FileType *

@@ -792,7 +792,7 @@ function! s:projection_complete(lead, cmdline, _) abort
     let results += map(projectionist#glob(glob), 's:match(v:val, format)')
   endfor
   call s:uniq(results)
-  return projectionist#completion_filter(results, a:lead, '/')
+  return map(projectionist#completion_filter(results, a:lead, '/'), 'fnameescape(v:val)')
 endfunction
 
 " Section: :A

@@ -82,7 +82,7 @@ function! projectionist#shellescape(arg) abort
 endfunction
 
 function! projectionist#shellpath(arg) abort
-  if empty(a:arg)
+  if empty(a:arg) || type(a:arg) !=# type('')
     return ''
   elseif a:arg =~# '^[[:alnum:].+-]\+:'
     return projectionist#shellescape(s:real(a:arg))

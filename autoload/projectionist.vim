@@ -456,7 +456,7 @@ function! s:query_file_recursive(key, ...) abort
   let keys = type(a:key) == type([]) ? a:key : [a:key]
   let start_file = get(a:0 ? a:1 : {}, 'file', get(b:, 'projectionist_file', expand('%:p')))
   let files = []
-  let visited_files = {start_file: 1}
+  let visited_files = {start_file : 1}
   let current_files = [start_file]
   let depth = 0
   while !empty(current_files) && depth < s:projectionist_max_file_recursion

@@ -85,6 +85,11 @@ The full list of available properties in a projection is as follows:
         Additional directories to prepend to 'path'.  Can be relative to the
         project root or absolute.  This is useful to set on a simple file glob
         like "*.js".
+						*projectionist-related*
+"related" ~
+        Indicates one or more files to search when a navigation command is
+        called without an argument, to find a default destination.  Related
+        files are searched recursively.
 						*projectionist-start*
 "start" ~
         Command to run to "boot" the project.  Examples include `lein run`,
@@ -100,11 +105,6 @@ The full list of available properties in a projection is as follows:
         this option is provided for a literal filename rather than a glob, it
         is used as the default destination of the navigation command when no
         argument is given.
-						*projectionist-related*
-"related" ~
-        Indicates one or more files to search when a navigation command is
-        called without an argument, to find a default destination.  Related
-        files are searched recursively.
 
                                                 *g:projectionist_heuristics*
 In addition to ".projections.json", projections can be defined globally

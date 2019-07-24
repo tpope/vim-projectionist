@@ -909,6 +909,9 @@ augroup END
 " Section: Templates
 
 function! projectionist#apply_template() abort
+  if !&modifiable
+    return ''
+  endif
   let template = get(projectionist#query('template'), 0, ['', ''])[1]
   if type(template) == type([]) && type(get(template, 0)) == type([])
     let template = template[0]

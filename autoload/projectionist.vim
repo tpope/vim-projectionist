@@ -924,7 +924,7 @@ function! projectionist#apply_template() abort
     if !&et
       let template = s:gsub(template, repeat(' ', &ts), "\t")
     endif
-    %delete_
+    silent %delete_
     call setline(1, split(template, "\n"))
      if exists('#User#ProjectionistApplyTemplate')
        doautocmd User ProjectionistApplyTemplate

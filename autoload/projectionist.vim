@@ -539,6 +539,11 @@ function! projectionist#append(root, ...) abort
     if !has_key(b:projectionist, root)
       let b:projectionist[root] = []
     endif
+    for [k, v] in items(filter(copy(projections), 'type(v:val) == type("")'))
+      if (k =~# '\*') ==# (v =~# '\*') && has_key(projections, v)
+        let projections[k] = projections[v]
+      endif
+    endfor
     call add(b:projectionist[root], filter(projections, 'type(v:val) == type({})'))
     return 1
   endif

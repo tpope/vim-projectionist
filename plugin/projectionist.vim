@@ -53,13 +53,13 @@ function! s:has(ns, root, requirements) abort
     return 0
   endif
   for test in split(a:requirements, '&')
-    let file = a:root . '/' . matchstr(test, '[^!].*')
-    if file =~# '\*'
-      let found = !empty(s:nscall(a:ns, 'glob', file))
-    elseif file =~# '/$'
-      let found = s:nscall(a:ns, 'isdirectory', file)
+    let relative = '/' . matchstr(test, '[^!].*')
+    if relative =~# '\*'
+      let found = !empty(s:nscall(a:ns, 'glob', escape(a:root, '[?*') . relative))
+    elseif relative =~# '/$'
+      let found = s:nscall(a:ns, 'isdirectory', a:root . relative)
     else
-      let found = s:nscall(a:ns, 'filereadable', file)
+      let found = s:nscall(a:ns, 'filereadable', a:root . relative)
     endif
     if test =~# '^!' ? found : !found
       return 0

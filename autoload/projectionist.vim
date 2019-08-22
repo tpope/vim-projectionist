@@ -558,9 +558,9 @@ function! projectionist#activate() abort
   endif
   if len(s:real(s:roots()[0]))
     command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Pcd
-          \ exe 'cd' projectionist#real(projectionist#path(<line2>) . '/' . <q-args>)
+          \ exe 'cd' projectionist#real(projectionist#path(<count>) . '/' . <q-args>)
     command! -buffer -bar -bang -nargs=* -range=1 -complete=customlist,s:dir_complete Plcd
-          \ exe (<bang>0 ? 'cd' : 'lcd') projectionist#real(projectionist#path(<line2>) . '/' . <q-args>)
+          \ exe (<bang>0 ? 'cd' : 'lcd') projectionist#real(projectionist#path(<count>) . '/' . <q-args>)
     if exists(':Cd') != 2
       command! -buffer -bar -bang -nargs=? -range=1 -complete=customlist,s:dir_complete Cd
             \ exe 'cd' projectionist#real(projectionist#path(<line2>) . '/' . <q-args>)

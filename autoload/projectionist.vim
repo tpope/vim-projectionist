@@ -682,6 +682,16 @@ function! s:dir_complete(lead, cmdline, _) abort
   return map(matches, 'fnameescape(v:val)')
 endfunction
 
+function! s:open_file(cmd, edit, file, jump)
+  call s:mkdir_p(fnamemodify(a:file, ':h'))
+  let escaped_file = fnameescape(fnamemodify(a:file, ':~:.'))
+  let command = a:edit
+  if bufexists(escaped_file) && empty(a:jump)
+    let command = 'buffer'
+  endif
+  return a:cmd.mods . command . a:cmd.pre . ' ' . a:jump . escaped_file
+endfunction
+
 " Section: Navigation commands
 
 let s:prefixes = {
@@ -776,9 +786,7 @@ function! s:open_projection(mods, edit, variants, ...) abort
       break
     endif
   endfor
-  call s:mkdir_p(fnamemodify(target, ':h'))
-  return cmd.mods . a:edit . cmd.pre . ' ' .
-        \ fnameescape(fnamemodify(target, ':~:.'))
+  return s:open_file(cmd, a:edit, target, '')
 endfunction
 
 function! s:projection_complete(lead, cmdline, _) abort
@@ -857,9 +865,7 @@ function! s:edit_command(mods, edit, count, ...) abort
     endif
   endif
   let [file, jump] = open
-  call s:mkdir_p(fnamemodify(file, ':h'))
-  return cmd.mods . a:edit . cmd.pre . ' ' .
-        \ jump . fnameescape(fnamemodify(file, ':~:.'))
+  return s:open_file(cmd, a:edit, file, jump)
 endfunction
 
 function! s:edit_complete(lead, cmdline, _) abort

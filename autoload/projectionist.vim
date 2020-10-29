@@ -65,14 +65,21 @@ function! s:slash(str) abort
 endfunction
 
 function! projectionist#json_parse(string) abort
-  let [null, false, true] = ['', 0, 1]
   let string = type(a:string) == type([]) ? join(a:string, ' ') : a:string
-  let stripped = substitute(string, '\C"\(\\.\|[^"\\]\)*"', '', 'g')
-  if stripped !~# "[^,:{}\\[\\]0-9.\\-+Eaeflnr-u \n\r\t]"
+  if exists('*json_decode')
     try
-      return eval(substitute(string, "[\r\n]", ' ', 'g'))
+      return json_decode(string)
     catch
     endtry
+  else
+    let [null, false, true] = ['', 0, 1]
+    let stripped = substitute(string, '\C"\(\\.\|[^"\\]\)*"', '', 'g')
+    if stripped !~# "[^,:{}\\[\\]0-9.\\-+Eaeflnr-u \n\r\t]"
+      try
+        return eval(substitute(string, "[\r\n]", ' ', 'g'))
+      catch
+      endtry
+    endif
   endif
   throw "invalid JSON: ".string
 endfunction

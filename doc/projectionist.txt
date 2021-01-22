@@ -134,8 +134,8 @@ Note the use of VimScript |line-continuation|.
 COMMANDS                                        *projectionist-commands*
 
 In addition to any navigation commands provided by your projections (which
-take the form :Efoo, :Sfoo, :Vfoo, :Tfoo, and :Dfoo), the following commands
-are available.
+take the form :Efoo, :Sfoo, :Vfoo, :Tfoo, :Dfoo, and :Ofoo), the following
+commands are available.
 
                                                 *projectionist-:A*
 :A                      Edit the alternate file for the current buffer, as
@@ -148,6 +148,8 @@ are available.
 :AV [file]              Like :A, but open in a vertical split.
                                                 *projectionist-:AT*
 :AT [file]              Like :A, but open in a tab.
+                                                *projectionist-:AO*
+:AO [file]              Like :A, but open using |:drop|.
 
                                                 *projectionist-:AD*
 :AD                     Replace the contents of the buffer with the new file

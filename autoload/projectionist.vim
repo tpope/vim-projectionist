@@ -701,6 +701,7 @@ let s:prefixes = {
       \ 'S': 'split',
       \ 'V': 'vsplit',
       \ 'T': 'tabedit',
+      \ 'O': 'drop',
       \ 'D': 'read'}
 
 function! projectionist#navigation_commands() abort

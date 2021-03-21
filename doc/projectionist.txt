@@ -167,6 +167,10 @@ commands are available.
                                                 *projectionist-:Lcd*
 :Plcd [path]             Like :Pcd, but use |:lcd|.
 
+                                                *projectionist-:Ptcd*
+                                                *projectionist-:Tcd*
+:Ptcd [path]             Like :Pcd, but use |:tcd|.
+
                                                 *projectionist-:ProjectDo*
 :ProjectDo {cmd}        Change directory to the project root, execute the
                         given command, and change back.  This won't work if

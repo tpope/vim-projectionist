@@ -142,7 +142,10 @@ augroup projectionist
         \     &buftype !~# 'nofile\|quickfix' |
         \   call ProjectionistDetect(expand('%:p')) |
         \ endif
-  autocmd BufFilePost * call ProjectionistDetect(expand('<afile>:p'))
+  autocmd BufFilePost *
+        \ if filereadable(expand('<afile>:p')) |
+        \   call ProjectionistDetect(expand('<afile>:p')) |
+        \ endif
   autocmd BufNewFile,BufReadPost *
         \ if empty(&filetype) |
         \   call ProjectionistDetect(expand('<afile>:p')) |

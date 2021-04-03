@@ -143,7 +143,7 @@ augroup projectionist
         \   call ProjectionistDetect(expand('%:p')) |
         \ endif
   autocmd BufFilePost *
-        \ if filereadable(expand('<afile>:p')) |
+        \ if expand('<afile>') !~# '^!' |
         \   call ProjectionistDetect(expand('<afile>:p')) |
         \ endif
   autocmd BufNewFile,BufReadPost *

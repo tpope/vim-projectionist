@@ -161,7 +161,7 @@ augroup projectionist
         \   call ProjectionistDetect(b:NERDTree.root.path.str()) |
         \ endif
   autocmd VimEnter *
-        \ if empty(expand('<afile>:p')) |
+        \ if get(g:, 'projectionist_vim_enter', 1) && empty(expand('<afile>:p')) |
         \   call ProjectionistDetect(getcwd()) |
         \ endif
   autocmd BufWritePost .projections.json call ProjectionistDetect(expand('<afile>:p'))

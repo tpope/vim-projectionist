@@ -168,6 +168,5 @@ augroup projectionist
   autocmd BufNewFile *
         \ if !empty(get(b:, 'projectionist')) |
         \   call projectionist#apply_template() |
-        \   setlocal nomodified |
         \ endif
 augroup END

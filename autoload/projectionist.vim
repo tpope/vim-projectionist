@@ -939,7 +939,7 @@ function! projectionist#apply_template() abort
     let l:.template = join(template, "\n")
   endif
   if !empty(template)
-    let template = s:gsub(template, '\t', repeat(' ', &sw))
+    let template = s:gsub(template, '\t', repeat(' ', &sw ? &sw : &ts))
     if !&et
       let template = s:gsub(template, repeat(' ', &ts), "\t")
     endif

@@ -939,9 +939,8 @@ function! projectionist#apply_template() abort
     let l:.template = join(template, "\n")
   endif
   if !empty(template)
-    let template = s:gsub(template, '\t', repeat(' ', &sw ? &sw : &ts))
-    if !&et
-      let template = s:gsub(template, repeat(' ', &ts), "\t")
+    if &et
+      let template = s:gsub(template, '\t', repeat(' ', &sw ? &sw : &ts))
     endif
     silent %delete_
     call setline(1, split(template, "\n"))

@@ -25,6 +25,8 @@ function! ProjectionistHas(req, ...) abort
   endfor
 endfunction
 
+let s:slash = exists('+shellslash') ? '\' : '/'
+
 if !exists('g:projectionist_heuristics')
   let g:projectionist_heuristics = {}
 endif
@@ -71,18 +73,23 @@ endfunction
 function! ProjectionistDetect(path) abort
   let b:projectionist = {}
   unlet! b:projectionist_file
-  if a:path =~# '^\a[[:alnum:].+-]\+:'
-    let file = substitute(a:path, '[\/]$', '', '')
+  if empty(a:path) || &l:buftype !~# '^\%(nowrite\|acwrite\)\=$'
+    return
+  elseif tr(a:path, s:slash, '/') =~# '^\a\+:\|^/'
+    let file = a:path
   else
-    let file = simplify(fnamemodify(resolve(a:path), ':p:s?[\/]$??'))
+    let file = simplify(getcwd() . (exists('+shellslash') && !&shellslash ? '\' . '/') . a:path)
   endif
 
-  let root = file
   let ns = matchstr(file, '^\a\a\+\ze:')
-  if len(ns) && get(g:, 'projectionist_ignore_' . ns)
+  if empty(ns)
+    let file = resolve(file)
+  elseif get(g:, 'projectionist_ignore_' . ns)
     return
   endif
   call s:load(ns)
+  let file = substitute(file, '[' . s:slash . '/]$', '', '')
+  let root = file
   let previous = ""
   while root !=# previous && root !=# '.'
     if s:nscall(ns, 'filereadable', root . '/.projections.json')

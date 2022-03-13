@@ -232,11 +232,7 @@ function! projectionist#glob(file, ...) abort
     let root = projectionist#path('', a:1)
   endif
   let path = s:absolute(a:file, root)
-  if v:version >= 704
-    let files = s:fcall('glob', path, a:0 > 1 ? a:2 : 0, 1)
-  else
-    let files = split(s:fcall('glob', path), "\n")
-  endif
+  let files = s:fcall('glob', path, a:0 > 1 ? a:2 : 0, 1)
   if len(root) || a:0 && a:1 is# 0
     call map(files, 's:slash(v:val) . (v:val !~# "[\/]$" && projectionist#isdirectory(v:val) ? "/" : "")')
   endif

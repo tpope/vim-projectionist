@@ -3,7 +3,7 @@
 " Version:      1.3
 " GetLatestVimScripts: 4989 1 :AutoInstall: projectionist.vim
 
-if exists("g:loaded_projectionist") || v:version < 700 || &cp
+if exists("g:loaded_projectionist") || v:version < 704 || &cp
   finish
 endif
 let g:loaded_projectionist = 1
@@ -112,24 +112,12 @@ function! ProjectionistDetect(path) abort
   endwhile
 
   if exists('#User#ProjectionistDetect')
-    if v:version >= 704 || (v:version == 703 && has('patch442'))
-      try
-        let g:projectionist_file = file
-        doautocmd <nomodeline> User ProjectionistDetect
-      finally
-        unlet! g:projectionist_file
-      endtry
-    else
-      let modelines = &modelines
-      try
-        set modelines=0
-        let g:projectionist_file = file
-        doautocmd User ProjectionistDetect
-      finally
-        let &modelines = modelines
-        unlet! g:projectionist_file
-      endtry
-    endif
+    try
+      let g:projectionist_file = file
+      doautocmd <nomodeline> User ProjectionistDetect
+    finally
+      unlet! g:projectionist_file
+    endtry
   endif
 
   if !empty(b:projectionist)

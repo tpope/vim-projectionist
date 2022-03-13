@@ -78,7 +78,7 @@ function! ProjectionistDetect(path) abort
   elseif tr(a:path, s:slash, '/') =~# '^\a\+:\|^/'
     let file = a:path
   else
-    let file = simplify(getcwd() . (exists('+shellslash') && !&shellslash ? '\' . '/') . a:path)
+    let file = simplify(getcwd() . (exists('+shellslash') && !&shellslash ? '\' : '/') . a:path)
   endif
 
   let ns = matchstr(file, '^\a\a\+\ze:')

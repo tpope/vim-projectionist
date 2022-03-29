@@ -14,7 +14,6 @@ function! ProjectionistHas(req, ...) abort
     return
   endif
   let ns = matchstr(a:0 ? a:1 : a:req, '^\a\a\+\ze:')
-  call s:load(ns)
   if !a:0
     return s:nscall(ns, a:req =~# '[\/]$' ? 'isdirectory' : 'filereadable', a:req)
   endif
@@ -31,20 +30,9 @@ if !exists('g:projectionist_heuristics')
   let g:projectionist_heuristics = {}
 endif
 
-if !exists('s:loaded')
-  let s:loaded = {}
-endif
-
-function! s:load(ns) abort
-  if len(a:ns) && !has_key(s:loaded, a:ns) && len(findfile('autoload/' . a:ns . '.vim', escape(&rtp, ' ')))
-    exe 'runtime! autoload/' . a:ns . '.vim'
-    let s:loaded[a:ns] = 1
-  endif
-endfunction
-
 function! s:nscall(ns, fn, path, ...) abort
-  if len(a:ns) && !get(g:, 'projectionist_ignore_' . a:ns) && exists('*' . a:ns . '#' . a:fn)
-    return call(a:ns . '#' . a:fn, [a:path] + a:000)
+  if !get(g:, 'projectionist_ignore_' . a:ns)
+    return call(get(get(g:, 'io_' . a:ns, {}), a:fn, a:fn), [a:path] + a:000)
   else
     return call(a:fn, [a:path] + a:000)
   endif
@@ -87,7 +75,6 @@ function! ProjectionistDetect(path) abort
   elseif get(g:, 'projectionist_ignore_' . ns)
     return
   endif
-  call s:load(ns)
   let file = substitute(file, '[' . s:slash . '/]$', '', '')
   let root = file
   let previous = ""

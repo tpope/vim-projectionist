@@ -135,20 +135,8 @@ function! s:parse(mods, args) abort
   return cmd
 endfunction
 
-if !exists('s:loaded')
-  let s:loaded = {}
-endif
 function! s:fcall(fn, path, ...) abort
-  let ns = matchstr(a:path, '^\a\a\+\ze:')
-  if len(ns) && !has_key(s:loaded, ns) && len(findfile('autoload/' . ns . '.vim', escape(&rtp, ' ')))
-    exe 'runtime! autoload/' . ns . '.vim'
-    let s:loaded[ns] = 1
-  endif
-  if len(ns) && exists('*' . ns . '#' . a:fn)
-    return call(ns . '#' . a:fn, [a:path] + a:000)
-  else
-    return call(a:fn, [a:path] + a:000)
-  endif
+  return call(get(get(g:, 'io_' . matchstr(a:path, '^\a\a\+\ze:'), {}), a:fn, a:fn), [a:path] + a:000)
 endfunction
 
 function! s:mkdir_p(path) abort

@@ -77,6 +77,12 @@ function! ProjectionistDetect(...) abort
   endif
   let file = substitute(file, '[' . s:slash . '/]$', '', '')
 
+  try
+    if exists('*ExcludeBufferFromDiscovery') && ExcludeBufferFromDiscovery(file, 'projectionist')
+      return
+    endif
+  catch
+  endtry
   let ns = matchstr(file, '^\a\a\+\ze:')
   if empty(ns)
     let file = resolve(file)

@@ -925,13 +925,16 @@ function! projectionist#apply_template() abort
     let l:.template = join(template, "\n")
   endif
   if !empty(template)
+    silent %delete_
+    if exists('#User#ProjectionistApplyTemplatePre')
+      doautocmd <nomodeline> User ProjectionistApplyTemplatePre
+    endif
     if &et
       let template = s:gsub(template, '\t', repeat(' ', &sw ? &sw : &ts))
     endif
-    silent %delete_
     call setline(1, split(template, "\n"))
     if exists('#User#ProjectionistApplyTemplate')
-      doautocmd User ProjectionistApplyTemplate
+      doautocmd <nomodeline> User ProjectionistApplyTemplate
     endif
     doautocmd BufReadPost
   endif

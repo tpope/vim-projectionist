@@ -58,16 +58,24 @@ function! s:has(ns, root, requirements) abort
   return 1
 endfunction
 
-function! ProjectionistDetect(path) abort
+function! s:IsAbs(path) abort
+  return tr(a:path, s:slash, '/') =~# '^/\|^\a\+:'
+endfunction
+
+function! ProjectionistDetect(...) abort
   let b:projectionist = {}
   unlet! b:projectionist_file
-  if empty(a:path) || &l:buftype !~# '^\%(nowrite\|acwrite\)\=$'
-    return
-  elseif tr(a:path, s:slash, '/') =~# '^\a\+:\|^/'
-    let file = a:path
+  if a:0
+    let file = a:1
+  elseif &l:buftype =~# '^\%(nowrite\)\=$' && len(@%) || &l:buftype =~# '^\%(nofile\|acwrite\)' && s:IsAbs(@%)
+    let file = @%
   else
-    let file = simplify(getcwd() . (exists('+shellslash') && !&shellslash ? '\' : '/') . a:path)
+    return
   endif
+  if !s:IsAbs(file)
+    let file = simplify(getcwd() . (exists('+shellslash') && !&shellslash ? '\' : '/') . file)
+  endif
+  let file = substitute(file, '[' . s:slash . '/]$', '', '')
 
   let ns = matchstr(file, '^\a\a\+\ze:')
   if empty(ns)
@@ -75,8 +83,10 @@ function! ProjectionistDetect(path) abort
   elseif get(g:, 'projectionist_ignore_' . ns)
     return
   endif
-  let file = substitute(file, '[' . s:slash . '/]$', '', '')
   let root = file
+  if empty(ns) && !isdirectory(root)
+    let root = fnamemodify(root, ':h')
+  endif
   let previous = ""
   while root !=# previous && root !=# '.'
     if s:nscall(ns, 'filereadable', root . '/.projections.json')
@@ -120,9 +130,10 @@ endif
 augroup projectionist
   autocmd!
   autocmd FileType *
-        \ if &filetype ==# 'netrw' ? !exists('b:projectionist') :
-        \     &buftype !~# 'nofile\|quickfix' |
-        \   call ProjectionistDetect(@%) |
+        \ if &filetype !=# 'netrw' |
+        \   call ProjectionistDetect() |
+        \ elseif !exists('b:projectionist') |
+        \   call ProjectionistDetect(get(b:, 'netrw_curdir', @%)) |
         \ endif
   autocmd BufFilePost *
         \ if type(getbufvar(+expand('<abuf>'), 'projectionist')) == type({}) |
@@ -130,7 +141,7 @@ augroup projectionist
         \ endif
   autocmd BufNewFile,BufReadPost *
         \ if empty(&filetype) |
-        \   call ProjectionistDetect(expand('<afile>')) |
+        \   call ProjectionistDetect() |
         \ endif
   autocmd CmdWinEnter *
         \ if !empty(getbufvar('#', 'projectionist_file')) |

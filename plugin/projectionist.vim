@@ -73,7 +73,8 @@ function! ProjectionistDetect(...) abort
     return
   endif
   if !s:IsAbs(file)
-    let file = simplify(getcwd() . (exists('+shellslash') && !&shellslash ? '\' : '/') . file)
+    let s = exists('+shellslash') && !&shellslash ? '\' : '/'
+    let file = substitute(getcwd(), '\' . s . '\=$', s, '') . file
   endif
   let file = substitute(file, '[' . s:slash . '/]$', '', '')
 

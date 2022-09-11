@@ -926,6 +926,9 @@ function! projectionist#apply_template() abort
   endif
   if !empty(template)
     silent %delete_
+    if template =~# '\t' && !exists('b:sleuth') && exists(':Sleuth') == 2
+      silent! Sleuth!
+    endif
     if exists('#User#ProjectionistApplyTemplatePre')
       doautocmd <nomodeline> User ProjectionistApplyTemplatePre
     endif

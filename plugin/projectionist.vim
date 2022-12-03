@@ -62,7 +62,7 @@ function! s:IsAbs(path) abort
   return tr(a:path, s:slash, '/') =~# '^/\|^\a\+:'
 endfunction
 
-function! ProjectionistDetect(...) abort
+function! s:Detect(...) abort
   let b:projectionist = {}
   unlet! b:projectionist_file
   if a:0
@@ -138,17 +138,17 @@ augroup projectionist
   autocmd!
   autocmd FileType *
         \ if &filetype !=# 'netrw' |
-        \   call ProjectionistDetect() |
+        \   call s:Detect() |
         \ elseif !exists('b:projectionist') |
-        \   call ProjectionistDetect(get(b:, 'netrw_curdir', @%)) |
+        \   call s:Detect(get(b:, 'netrw_curdir', @%)) |
         \ endif
   autocmd BufFilePost *
         \ if type(getbufvar(+expand('<abuf>'), 'projectionist')) == type({}) |
-        \   call ProjectionistDetect(expand('<afile>')) |
+        \   call s:Detect(expand('<afile>')) |
         \ endif
   autocmd BufNewFile,BufReadPost *
         \ if empty(&filetype) |
-        \   call ProjectionistDetect() |
+        \   call s:Detect() |
         \ endif
   autocmd CmdWinEnter *
         \ if !empty(getbufvar('#', 'projectionist_file')) |
@@ -158,13 +158,13 @@ augroup projectionist
         \ endif
   autocmd User NERDTreeInit,NERDTreeNewRoot
         \ if exists('b:NERDTree.root.path.str') |
-        \   call ProjectionistDetect(b:NERDTree.root.path.str()) |
+        \   call s:Detect(b:NERDTree.root.path.str()) |
         \ endif
   autocmd VimEnter *
         \ if get(g:, 'projectionist_vim_enter', 1) && empty(expand('<afile>')) |
-        \   call ProjectionistDetect(getcwd()) |
+        \   call s:Detect(getcwd()) |
         \ endif
-  autocmd BufWritePost .projections.json call ProjectionistDetect(expand('<afile>'))
+  autocmd BufWritePost .projections.json call s:Detect(expand('<afile>'))
   autocmd BufNewFile *
         \ if !empty(get(b:, 'projectionist')) |
         \   call projectionist#apply_template() |

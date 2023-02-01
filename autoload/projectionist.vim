@@ -608,7 +608,7 @@ function! projectionist#activate() abort
     execute 'command! -bar -bang -buffer -nargs=* Console ' .
           \ (exists(':Start') < 2 ?
           \ 'ProjectDo ' . (offset == 1 ? '' : offset.' ') . '!' . command :
-          \ 'Start<bang> ' . b:start) . ' <args>'
+          \ '<mods> Start<bang> ' . b:start) . ' <args>'
     break
   endfor
 

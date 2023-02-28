@@ -101,10 +101,18 @@ The full list of available properties in a projection is as follows:
         Array of lines to use when creating a new file.
 						*projectionist-type*
 "type" ~
-        Declares the type of file and navigation command it belongs to.  If
-        this option is provided for a literal filename rather than a glob, it
-        is used as the default destination of the navigation command when no
-        argument is given.
+        Declares the type of file and create a set of navigation commands for
+        opening files that match the glob.  If this option is provided for a
+        literal filename rather than a glob, it is used as the default
+        destination of the navigation command when no argument is given.  For
+        a "type" value of "foo", the following navigation commands will be
+        provided:
+        `:Efoo`: delegates to |:edit|
+        `:Sfoo`: delegates to |:split|
+        `:Vfoo`: delegates to |:vsplit|
+        `:Tfoo`: delegates to |:tabedit|
+        `:Dfoo`: delegates to |:read|
+        `:Ofoo`: delegates to |:drop|
 
                                                 *g:projectionist_heuristics*
 In addition to ".projections.json", projections can be defined globally
@@ -133,9 +141,8 @@ Note the use of VimScript |line-continuation|.
 
 COMMANDS                                        *projectionist-commands*
 
-In addition to any navigation commands provided by your projections (which
-take the form :Efoo, :Sfoo, :Vfoo, :Tfoo, :Dfoo, and :Ofoo), the following
-commands are available.
+In addition to any navigation commands provided by your projections (see
+|projectionist-type|), the following commands are available.
 
                                                 *projectionist-:A*
 :A                      Edit the alternate file for the current buffer, as

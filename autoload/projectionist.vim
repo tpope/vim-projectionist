@@ -606,6 +606,7 @@ function! projectionist#activate() abort
           \ ' -title=' . escape(fnamemodify(root, ':t'), '\ ') . '\ console ' .
           \ command
     execute 'command! -bar -bang -buffer -nargs=* Console ' .
+          \ (has('patch-7.4.1898') ? '<mods> ' : '') .
           \ (exists(':Start') < 2 ?
           \ 'ProjectDo ' . (offset == 1 ? '' : offset.' ') . '!' . command :
           \ 'Start<bang> ' . b:start) . ' <args>'

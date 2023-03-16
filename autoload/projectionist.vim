@@ -878,7 +878,7 @@ endfunction
 " Section: :ProjectDo
 
 function! s:do(bang, count, cmd) abort
-  let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
+  let cd = haslocaldir() ? 'lcd' : exists(':tcd') && haslocaldir(-1) ? 'tcd' : 'cd'
   let cwd = getcwd()
   let cmd = substitute(a:cmd, '^\d\+ ', '', '')
   let offset = cmd ==# a:cmd ? 1 : matchstr(a:cmd, '^\d\+')
@@ -899,7 +899,7 @@ function! s:qf_pre() abort
   let dir = substitute(matchstr(','.&l:errorformat, ',\%(%\\&\)\=\%(ch\)\=dir[ =]\zs\%(\\.\|[^,]\)*'), '\\,' ,',', 'g')
   let cwd = getcwd()
   if !empty(dir) && dir !=# cwd
-    let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
+    let cd = haslocaldir() ? 'lcd' : exists(':tcd') && haslocaldir(-1) ? 'tcd' : 'cd'
     execute cd fnameescape(dir)
     let s:qf_post = cd . ' ' . fnameescape(cwd)
   endif

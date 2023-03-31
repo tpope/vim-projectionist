@@ -104,6 +104,19 @@ project.
 
 [a.vim]: http://www.vim.org/scripts/script.php?script_id=31
 
+### Rotating lists of alternate files
+
+You can define lists of files to rotate, using a more generic pattern:
+
+    {
+        "src/*": {
+            "rotate": [ "src/{}.c", "src/{}.h", "src/proto/{}.pro" ],
+            "type": "source"
+        }
+    }
+
+Then you can rotate the list with `:Anext` and `:Aprev`.
+
 ### Buffer configuration
 
 Check out these examples for a minimal Ruby project:

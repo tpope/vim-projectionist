@@ -117,6 +117,8 @@ You can define lists of files to rotate, using a more generic pattern:
 
 Then you can rotate the list with `:Anext` and `:Aprev`.
 
+The "rotate" key is used as default for "alternate", if that isn't defined. 
+
 ### Buffer configuration
 
 Check out these examples for a minimal Ruby project:

@@ -407,7 +407,11 @@ function! projectionist#query_raw(key, ...) abort
     endif
     for pattern in reverse(sort(filter(keys(projections), 'v:val =~# s:valid_key && v:val =~# "\\*"'), function('projectionist#lencmp')))
       let match = s:match(name, pattern)
-      if (!empty(match) || pattern ==# '*') && has_key(projections[pattern], a:key)
+      " if 'rotate' is defined and 'alternate' isn't, use it as default for the latter
+      let key = a:key == 'rotate'
+                  \ || (a:key == 'alternate' && !has_key(projections[pattern], 'alternate'))
+                  \ ? 'rotate' : a:key
+      if (!empty(match) || pattern ==# '*') && has_key(projections[pattern], key)
         let expansions = extend({'match': match}, attrs)
         " if key is 'rotate', and value is a list with multiple patterns,
         " match current file among candidates; if it matches, set the index in
@@ -415,7 +419,7 @@ function! projectionist#query_raw(key, ...) abort
         " Note: b:projectionist_file must correspond to current file. It can be
         " temporarily different during the execution of some navigation
         " commands.
-        if a:key == 'rotate' && !empty(match) && file == expand('%:p')
+        if key == 'rotate' && !empty(match) && file == expand('%:p')
           let alts = projections[pattern]['rotate']
           if type(alts) != type([]) || len(alts) == 1
             continue
@@ -430,7 +434,7 @@ function! projectionist#query_raw(key, ...) abort
             endif
           endfor
         endif
-        call add(candidates, [projections[pattern][a:key], expansions])
+        call add(candidates, [projections[pattern][key], expansions])
       endif
     endfor
   endfor

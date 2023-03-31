@@ -69,7 +69,8 @@ The full list of available properties in a projection is as follows:
         It can be used as a rotating list of alternate files, then you can use
         |:Anext| and |:Aprev| to navigate the list. Note that in this case the
         `*` is replaced with the name of the current file, without the
-        extension.  Eg.: >
+        extension.  It is also used as default for |projectionist-alternate|,
+        if that isn't defined. Eg.: >
           {
             "src/*": {
               "rotate": [

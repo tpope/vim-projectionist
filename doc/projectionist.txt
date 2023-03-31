@@ -61,9 +61,22 @@ The full list of available properties in a projection is as follows:
 
 						*projectionist-alternate*
 "alternate" ~
-        Determines the destination of the |projectionist-:A| command.  If this
-        is a list, the first readable file will be used.  Will also be used as
-        a default for |projectionist-related|.
+        Determines the destination of the |projectionist-:A| command. Will
+        also be used as a default for |projectionist-related|.
+        If this is a list, it can be used as a rotating list of alternate
+        files, then you can use |:Anext| and |:Aprev| to navigate the list.
+        Eg.: >
+          {
+            "src/*": {
+              "alternate": [
+                "src/{}.c",
+                "src/{}.h",
+                "src/proto/{}.pro"
+              ],
+              "type": "source"
+            }
+          }
+<
 						*projectionist-console*
 "console" ~
         Command to run to start a REPL or other interactive shell.  Will be
@@ -149,6 +162,10 @@ In addition to any navigation commands provided by your projections (see
                         defined by the "alternate" key.
 
 :A {file}               Edit {file} relative to the innermost root.
+                                                *projectionist-:Anext*
+:Anext                  Next entry in the "alternate" rotating list.
+                                                *projectionist-:Aprev*
+:Aprev                  Previous entry in the "alternate" rotating list.
                                                 *projectionist-:AS*
 :AS [file]              Like :A, but open in a split.
                                                 *projectionist-:AV*

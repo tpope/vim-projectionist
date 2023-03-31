@@ -237,6 +237,9 @@ endfunction
 function! s:all() abort
   let all = []
   for key in s:roots()
+    if key == '__index'
+      continue
+    endif
     for value in b:projectionist[key]
       call add(all, [key, value])
     endfor
@@ -406,6 +409,27 @@ function! projectionist#query_raw(key, ...) abort
       let match = s:match(name, pattern)
       if (!empty(match) || pattern ==# '*') && has_key(projections[pattern], a:key)
         let expansions = extend({'match': match}, attrs)
+        " if key is 'alternate', and value is a list with multiple patterns,
+        " match current file among candidates; if it matches, set the index in
+        " the list to use when choosing which file to edit.
+        " Note: b:projectionist_file must correspond to current file. It can be
+        " temporarily different during the execution of some navigation
+        " commands.
+        if a:key == 'alternate' && !empty(match) && file == expand('%:p')
+          let alts = projections[pattern]['alternate']
+          if type(alts) != type([]) || len(alts) == 1
+            continue
+          endif
+          " we don't want the extension if glob has *
+          let expansions.match = fnamemodify(expansions.match, ':t:r')
+          let [prev, max] = [get(b:, 'projectionist_prev'), len(alts) - 1]
+          for i in range(len(alts))
+            if name ==# substitute(alts[i], '{[^{}]*}', '\=s:expand_placeholders(submatch(0), expansions)', 'g')
+              let b:projectionist.__index = prev && i > 0 ? i - 1 : prev ? max : i == max ? 0 : i + 1
+              break
+            endif
+          endfor
+        endif
         call add(candidates, [projections[pattern][a:key], expansions])
       endif
     endfor
@@ -582,6 +606,8 @@ function! projectionist#activate() abort
           \ 'A'.prefix
           \ ':execute s:edit_command("<mods>", "'.excmd.'<bang>", <count>, <f-args>)'
   endfor
+  command! -buffer -bar -bang Anext :execute s:edit_command("<mods>", "edit<bang>", 0, <f-args>)
+  command! -buffer -bar -bang Aprev :execute s:edit_command("<mods>", "prev<bang>", 0, <f-args>)
 
   for [root, makeprg] in projectionist#query_exec('make')
     unlet! b:current_compiler
@@ -837,13 +863,15 @@ function! s:edit_command(mods, edit, count, ...) abort
     if a:count > 0
       let expansions.lnum = a:count
     endif
+    let b:projectionist_prev = a:edit =~# 'prev'
     let alternates = projectionist#query_file('alternate', expansions)
+    unlet b:projectionist_prev
     let warning = get(filter(copy(alternates), 'v:val =~# "replace %.*}"'), 0, '')
     if !empty(warning)
       return 'echoerr '.string(matchstr(warning, 'replace %.*}').' in alternate projection')
     endif
     call map(alternates, 's:jumpopt(v:val)')
-    let open = get(filter(copy(alternates), 'projectionist#getftime(v:val[0]) >= 0'), 0, [])
+    let open = get(filter(copy(alternates), 'projectionist#getftime(v:val[0]) >= 0'), get(b:projectionist, '__index'), [])
     if empty(alternates)
       return 'echoerr "No alternate file"'
     elseif empty(open)
@@ -864,7 +892,7 @@ function! s:edit_command(mods, edit, count, ...) abort
   endif
   let [file, jump] = open
   call s:mkdir_p(fnamemodify(file, ':h'))
-  return cmd.mods . a:edit . cmd.pre . ' ' .
+  return cmd.mods . substitute(a:edit, 'prev', 'edit', '') . cmd.pre . ' ' .
         \ jump . fnameescape(fnamemodify(file, ':~:.'))
 endfunction
 

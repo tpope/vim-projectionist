@@ -602,8 +602,8 @@ function! projectionist#activate() abort
 
   for [root, command] in projectionist#query_exec('console')
     let offset = index(s:roots(), root) + 1
-    let b:start = '-dir=' . fnameescape(root) .
-          \ ' -title=' . escape(fnamemodify(root, ':t'), '\ ') . '\ console ' .
+    let b:start = '++dir=' . fnameescape(root) .
+          \ ' ++title=' . escape(fnamemodify(root, ':t'), '\ ') . '\ console ' .
           \ command
     execute 'command! -bar -bang -buffer -nargs=* Console ' .
           \ (has('patch-7.4.1898') ? '<mods> ' : '') .
@@ -615,12 +615,12 @@ function! projectionist#activate() abort
 
   for [root, command] in projectionist#query_exec('start')
     let offset = index(s:roots(), root) + 1
-    let b:start = '-dir=' . fnameescape(root) . ' ' . command
+    let b:start = '++dir=' . fnameescape(root) . ' ' . command
     break
   endfor
 
   for [root, command] in s:query_exec_with_alternate('dispatch')
-    let b:dispatch = '-dir=' . fnameescape(root) . ' ' . command
+    let b:dispatch = '++dir=' . fnameescape(root) . ' ' . command
     break
   endfor
 

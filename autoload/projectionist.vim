@@ -636,7 +636,9 @@ function! projectionist#activate() abort
     if len(tags) && stridx(','.&l:tags.',', ','.escape(tags, ', ').',') < 0
       let &l:tags = &tags . ',' . escape(tags, ', ')
     endif
+    let outermost = root
   endfor
+  let b:workspace_folder = outermost
 
   if exists('#User#ProjectionistActivate')
     doautocmd User ProjectionistActivate

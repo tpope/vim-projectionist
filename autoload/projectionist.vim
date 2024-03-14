@@ -804,7 +804,7 @@ endfunction
 " Section: :A
 
 function! s:jumpopt(file) abort
-  let pattern = '!$\|:\d\+:\d\+$\|[:@#]\d\+$\|[@#].*$'
+  let pattern = '!$\|:\d\+:\d\+$\|[:@#]\d\+$'
   let file = substitute(a:file, pattern, '', '')
   let jump = matchstr(a:file, pattern)
   if jump =~# '^:\d\+:\d\+$'

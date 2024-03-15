@@ -804,17 +804,15 @@ endfunction
 " Section: :A
 
 function! s:jumpopt(file) abort
-  let pattern = '!$\|:\d\+:\d\+$\|[:@#]\d\+$\|[@#].*$'
+  let pattern = '!$\|:\d\+:\d\+$\|:\d\+$'
   let file = substitute(a:file, pattern, '', '')
   let jump = matchstr(a:file, pattern)
   if jump =~# '^:\d\+:\d\+$'
     return [file, '+call\ cursor('.tr(jump[1:-1], ':', ',') . ') ']
-  elseif jump =~# '^[:+@#]\d\+$'
+  elseif jump =~# '^:\d\+$'
     return [file, '+'.jump[1:-1].' ']
   elseif jump ==# '!'
     return [file, '+AD ']
-  elseif !empty(jump)
-    return [file, '+A'.escape(jump, ' ').' ']
   else
     return [file, '']
   endif

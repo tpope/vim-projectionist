@@ -293,11 +293,11 @@ function! g:projectionist_transformations.snakecase(input, o) abort
 endfunction
 
 function! g:projectionist_transformations.dirname(input, o) abort
-  return substitute(a:input, '.[^'.projectionist#slash().'/]*$', '', '')
+  return substitute(a:input, '.[^/]*$', '', '')
 endfunction
 
 function! g:projectionist_transformations.basename(input, o) abort
-  return substitute(a:input, '.*['.projectionist#slash().'/]', '', '')
+  return substitute(a:input, '.*/', '', '')
 endfunction
 
 function! g:projectionist_transformations.singular(input, o) abort
@@ -393,7 +393,6 @@ function! projectionist#query_raw(key, ...) abort
   let candidates = []
   let file = a:0 ? a:1 : get(b:, 'projectionist_file', expand('%:p'))
   for [path, projections] in s:all()
-    let pre = path . projectionist#slash()
     let attrs = {'project': path, 'file': file}
     let name = file[strlen(path)+1:-1]
     if strpart(file, 0, len(path)) !=# path
@@ -760,10 +759,10 @@ function! s:open_projection(mods, edit, variants, ...) abort
   endif
   if len(cmd.args)
     call filter(formats, 'v:val =~# "\\*"')
-    let name = join(cmd.args, ' ')
+    let name = s:slash(join(cmd.args, ' '))
     let dir = matchstr(name, '.*\ze/')
-    let base = matchstr(name, '[^\/]*$')
-    call map(formats, 'substitute(substitute(v:val, "\\*\\*\\([\\/]\\=\\)", empty(dir) ? "" : dir . "\\1", ""), "\\*", base, "")')
+    let base = substitute(name, '.*/', '', '')
+    call map(formats, 'substitute(substitute(v:val, "\\*\\*\\(/\\=\\)", empty(dir) ? "" : dir . "\\1", ""), "\\*", base, "")')
   else
     let related_file = s:find_related_file(formats)
     if !empty(related_file)
@@ -794,7 +793,7 @@ function! s:projection_complete(lead, cmdline, _) abort
     if format !~# '\*'
       continue
     endif
-    let glob = substitute(format, '[^\/]*\ze\*\*[\/]\*', '', 'g')
+    let glob = substitute(format, '[^/]*\ze\*\*/\*', '', 'g')
     let results += map(projectionist#glob(glob), 's:match(v:val, format)')
   endfor
   call s:uniq(results)

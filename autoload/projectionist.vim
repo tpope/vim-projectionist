@@ -61,7 +61,7 @@ function! projectionist#slash(...) abort
 endfunction
 
 function! s:slash(str) abort
-  return tr(a:str, projectionist#slash(), '/')
+  return exists('+shellslash') ? tr(a:str, '\', '/', 'g') : a:str
 endfunction
 
 function! projectionist#json_parse(string) abort
@@ -152,14 +152,14 @@ function! s:roots() abort
 endfunction
 
 function! projectionist#path(...) abort
-  let abs = '^[' . projectionist#slash() . '/]\|^\a\+:\|^\.\.\=\%(/\|$\)'
+  let abs = '^/\|^\a\+:\|^\.\.\=\%(/\|$\)'
   if a:0 && s:slash(a:1) =~# abs || (a:0 > 1 && a:2 is# 0)
     return s:slash(a:1)
   endif
   if a:0 && type(a:1) ==# type(0)
     let root = get(s:roots(), (a:1 < 0 ? -a:1 : a:1) - 1, '')
     if a:0 > 1
-      if a:2 =~# abs
+      if s:slash(a:2) =~# abs
         return a:2
       endif
       let file = a:2
@@ -208,7 +208,7 @@ endfunction
 function! projectionist#readfile(path, ...) abort
   let args = copy(a:000)
   let path = a:path
-  if get(args, 0, '') =~# '[\/.]' || type(get(args, 0, '')) == type(0) || type(path) == type(0)
+  if s:slash(get(args, 0, '')) =~# '[/.]' || type(get(args, 0, '')) == type(0) || type(path) == type(0)
     let path = projectionist#path(path, remove(args, 0))
   endif
   return call('s:fcall', ['readfile'] + [path] + args)
@@ -222,7 +222,8 @@ function! projectionist#glob(file, ...) abort
   let path = s:absolute(a:file, root)
   let files = s:fcall('glob', path, a:0 > 1 ? a:2 : 0, 1)
   if len(root) || a:0 && a:1 is# 0
-    call map(files, 's:slash(v:val) . (v:val !~# "[\/]$" && projectionist#isdirectory(v:val) ? "/" : "")')
+    call map(files, 's:slash(v:val)')
+    call map(files, 'v:val . (v:val !~# "/$" && projectionist#isdirectory(v:val) ? "/" : "")')
   endif
   if len(root)
     call map(files, 'strpart(v:val, 0, len(root)) ==# root ? strpart(v:val, len(root)) : v:val')
@@ -424,10 +425,10 @@ function! projectionist#query(key, ...) abort
 endfunction
 
 function! s:absolute(path, in) abort
-  if a:path =~# '^\%([[:alnum:].+-]\+:\)\|^\.\?[\/]\|^$'
+  if s:slash(a:path) =~# '^\%([[:alnum:].+-]\+:\)\|^\.\=/\|^$'
     return a:path
   else
-    return substitute(a:in, '[\/]$', '', '') . projectionist#slash() . a:path
+    return a:in . (s:slash(a:in) =~# '/$' ? '' : projectionist#slash()) . a:path
   endif
 endfunction
 

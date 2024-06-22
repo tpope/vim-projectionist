@@ -219,7 +219,10 @@ function! projectionist#glob(file, ...) abort
   if a:0
     let root = projectionist#path('', a:1)
   endif
-  let path = s:absolute(a:file, root)
+  let path = a:file
+  if !empty(root) && s:slash(path) !~# '^\.\.\=\%(/\|$\)'
+    let path = s:absolute(path, root)
+  endif
   let files = s:fcall('glob', path, a:0 > 1 ? a:2 : 0, 1)
   if len(root) || a:0 && a:1 is# 0
     call map(files, 's:slash(v:val)')
@@ -294,7 +297,7 @@ function! g:projectionist_transformations.snakecase(input, o) abort
 endfunction
 
 function! g:projectionist_transformations.dirname(input, o) abort
-  return substitute(a:input, '.[^/]*$', '', '')
+  return a:input !~# '/' ? '.' : substitute(a:input, '/[^/]*$', '', '')
 endfunction
 
 function! g:projectionist_transformations.basename(input, o) abort
@@ -425,10 +428,13 @@ function! projectionist#query(key, ...) abort
 endfunction
 
 function! s:absolute(path, in) abort
-  if s:slash(a:path) =~# '^\%([[:alnum:].+-]\+:\)\|^\.\=/\|^$'
+  let in_with_slash = a:in . (s:slash(a:in) =~# '/$' ? '' : projectionist#slash())
+  if s:slash(a:path) =~# '^\%([[:alnum:].+-]\+:\)\|^/\|^$'
     return a:path
+  elseif s:slash(a:path) =~# '^\.\%(/\|$\)'
+    return in_with_slash[0:-2] . a:path[1 : -1]
   else
-    return a:in . (s:slash(a:in) =~# '/$' ? '' : projectionist#slash()) . a:path
+    return in_with_slash . a:path
   endif
 endfunction
 

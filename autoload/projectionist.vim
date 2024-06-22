@@ -857,7 +857,7 @@ function! s:edit_command(mods, edit, count, ...) abort
       let i = 0
       for [alt, _] in alternates
         let i += 1
-        call add(choices, i.' '.alt)
+        call add(choices, i . ' ' . fnamemodify(alt, ':~:.'))
       endfor
       let i = inputlist(choices)
       if i > 0

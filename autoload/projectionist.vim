@@ -398,7 +398,11 @@ function! projectionist#query_raw(key, ...) abort
   let file = a:0 ? a:1 : get(b:, 'projectionist_file', expand('%:p'))
   for [path, projections] in s:all()
     let attrs = {'project': path, 'file': file}
-    let name = file[strlen(path)+1:-1]
+    if path == '/'
+      let name = file
+    else
+      let name = file[strlen(path)+1:-1]
+    endif
     if strpart(file, 0, len(path)) !=# path
       let name = ''
     endif

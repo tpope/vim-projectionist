@@ -61,7 +61,7 @@ function! projectionist#slash(...) abort
 endfunction
 
 function! s:slash(str) abort
-  return exists('+shellslash') ? tr(a:str, '\', '/', 'g') : a:str
+  return exists('+shellslash') ? tr(a:str, '\', '/') : a:str
 endfunction
 
 function! projectionist#json_parse(string) abort

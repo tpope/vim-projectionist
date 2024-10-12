@@ -398,6 +398,10 @@ function! projectionist#query_raw(key, ...) abort
   let file = a:0 ? a:1 : get(b:, 'projectionist_file', expand('%:p'))
   for [path, projections] in s:all()
     let attrs = {'project': path, 'file': file}
+    " Remove duplicated slashes in path, e.g. ///home/folder
+    let path = substitute(path, '/\{2,}', '/', 'g')
+    let file = substitute(file, '/\{2,}', '/', 'g')
+
     if path == '/'
       let name = file
     else

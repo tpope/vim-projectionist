@@ -43,7 +43,7 @@ function! s:has(ns, root, requirements) abort
     return 0
   endif
   for test in split(a:requirements, '&')
-    let relative = '/' . matchstr(test, '[^!].*')
+    let relative = '/' . matchstr(test, '[^!/].*')
     if relative =~# '\*'
       let found = !empty(s:nscall(a:ns, 'glob', escape(a:root, '[?*') . relative))
     elseif relative =~# '/$'

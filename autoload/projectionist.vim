@@ -398,9 +398,13 @@ function! projectionist#query_raw(key, ...) abort
   let file = a:0 ? a:1 : get(b:, 'projectionist_file', expand('%:p'))
   for [path, projections] in s:all()
     let attrs = {'project': path, 'file': file}
-    let name = file[strlen(path)+1:-1]
-    if strpart(file, 0, len(path)) !=# path
-      let name = ''
+    let pre = path
+    if s:slash(pre[-1 : -1]) !=# '/'
+      let pre .= projectionist#slash()
+    endif
+    let name = ''
+    if strpart(file, 0, len(pre)) ==# pre
+      let name = strpart(file, len(pre))
     endif
     if has_key(projections, name) && has_key(projections[name], a:key)
       call add(candidates, [projections[name][a:key], attrs])
